@@ -2,6 +2,20 @@
 
 ## A Machine-Checked Separation of Completion and Finite Attainment in the Gregory-Leibniz Construction of Pi
 
+## Publication and DOI
+
+**Zenodo record:** https://zenodo.org/records/22054459  
+**DOI:** https://doi.org/10.5281/zenodo.22054459  
+**Version:** 1.5.3  
+**Publication date:** 2026-08-22  
+**Paper license:** CC BY 4.0
+
+Recommended citation:
+
+> Eduardo Martinez Dammroze (2026). *Operational vs Semantic Equality: A Machine-Checked Separation of Completion and Finite Attainment in the Gregory-Leibniz Construction of Pi*. Version 1.5.3. Zenodo. https://doi.org/10.5281/zenodo.22054459
+
+The GitHub repository and the exact `v1.5.3` release are recorded in Zenodo as supplementary formal-source identifiers.
+
 ### Headline
 
 **Completion is not a finite-witness extractor.**

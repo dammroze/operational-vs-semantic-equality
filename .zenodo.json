@@ -1,9 +1,9 @@
 {
-  "title": "Operational",
+  "title": "Operational vs Semantic Equality: A Machine-Checked Separation of Completion and Finite Attainment in the Gregory-Leibniz Construction of Pi",
   "upload_type": "publication",
-  "publication_type": "article",
-  "publication_date": "Semantic",
-  "version": "vs",
+  "publication_type": "preprint",
+  "publication_date": "2026-08-22",
+  "version": "1.5.3",
   "creators": [
     {
       "name": "Dammroze, Eduardo Martinez",

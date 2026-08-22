@@ -1,13 +1,15 @@
 cff-version: 1.2.0
-message: "If you use or discuss this work, please cite this V1.5.3 release."
-title: "Operational"
+message: "If you use or discuss this work, please cite the Zenodo publication for V1.5.3."
+title: "Operational vs Semantic Equality: A Machine-Checked Separation of Completion and Finite Attainment in the Gregory-Leibniz Construction of Pi"
 type: software
 authors:
   - family-names: "Dammroze"
     given-names: "Eduardo Martinez"
     orcid: "https://orcid.org/0009-0002-9395-7778"
-version: "vs"
-date-released: "Semantic"
+version: "1.5.3"
+date-released: "2026-08-22"
+repository-code: "https://github.com/dammroze/operational-vs-semantic-equality"
+url: "https://github.com/dammroze/operational-vs-semantic-equality/releases/tag/v1.5.3"
 keywords:
   - "foundations of mathematics"
   - "finite attainment"
@@ -18,3 +20,13 @@ keywords:
   - "Lean 4"
   - "formal verification"
   - "machine-checked mathematics"
+preferred-citation:
+  type: article
+  title: "Operational vs Semantic Equality: A Machine-Checked Separation of Completion and Finite Attainment in the Gregory-Leibniz Construction of Pi"
+  authors:
+    - family-names: "Dammroze"
+      given-names: "Eduardo Martinez"
+      orcid: "https://orcid.org/0009-0002-9395-7778"
+  year: 2026
+  doi: "10.5281/zenodo.22054459"
+  url: "https://zenodo.org/records/22054459"

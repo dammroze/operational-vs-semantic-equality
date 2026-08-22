@@ -20,6 +20,31 @@ additional finite witness data.
 It also clarifies that machine-style PASS flags are scoped audit
 records for named modules and theorem families.
 
+## Archival publication and DOI
+
+Zenodo record:
+
+    https://zenodo.org/records/22054459
+
+DOI:
+
+    https://doi.org/10.5281/zenodo.22054459
+
+Version:
+
+    1.5.3
+
+Publication date:
+
+    2026-08-22
+
+Paper license:
+
+    Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+The GitHub repository and exact `v1.5.3` release are recorded in the
+Zenodo record as supplementary formal-source identifiers.
+
 TeX SHA-256:
 
     7a0f939392ff82cce0c1220440fced23110396d50298a3c24b21929cc1b1d3e9
