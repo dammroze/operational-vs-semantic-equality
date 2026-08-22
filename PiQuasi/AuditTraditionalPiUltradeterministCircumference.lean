@@ -1,0 +1,17 @@
+import PiQuasi.TraditionalPiUltradeterministCircumference
+
+#print axioms PiQuasi.circumference_debt_numerator_formula
+#print axioms PiQuasi.circumference_debt_denominator_formula
+#print axioms PiQuasi.circumference_debt_sign_formula
+
+#print axioms PiQuasi.circumference_debt_zero_forces_terminal
+#print axioms PiQuasi.circumference_closure_debt_nonzero
+
+#print axioms PiQuasi.no_constructed_stage_closes_circumference
+#print axioms PiQuasi.no_traditional_pi_circumference_closure_witness
+
+#print axioms PiQuasi.every_finite_continuation_has_nonzero_closure_debt
+#print axioms PiQuasi.every_finite_continuation_remains_nonclosed
+#print axioms PiQuasi.traditional_pi_circumference_never_eventually_closes
+
+#print axioms PiQuasi.traditional_pi_ultradeterminist_circumference_nonclosure

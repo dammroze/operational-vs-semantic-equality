@@ -1,0 +1,13 @@
+import PiQuasi.IndependentFiniteProgressBridge
+
+#print axioms PiQuasi.progress_uAdd_zero_left
+#print axioms PiQuasi.progress_uAdd_comm
+#print axioms PiQuasi.progress_uAdd_right_cancel
+#print axioms PiQuasi.progress_uAdd_eq_self_implies_zero
+#print axioms PiQuasi.progress_uMul_pToU_eq_zero_implies_left_zero
+#print axioms PiQuasi.progress_signed_add_eq_self_implies_zero
+#print axioms PiQuasi.traditional_pi_progress_finish_is_exact_add_numerator
+#print axioms PiQuasi.traditional_pi_progress_closure_forces_terminal
+#print axioms PiQuasi.traditional_pi_finite_progress_not_closed
+#print axioms PiQuasi.no_traditional_pi_finite_progress_closure_witness
+#print axioms PiQuasi.independent_finite_progress_bridge_result

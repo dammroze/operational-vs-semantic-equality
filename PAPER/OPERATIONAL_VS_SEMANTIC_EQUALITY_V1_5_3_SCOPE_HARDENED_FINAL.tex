@@ -1,0 +1,5148 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\geometry{margin=2.4cm}
+
+\hypersetup{
+  pdftitle={Operational vs Semantic Equality: A Machine-Checked Separation of Completion and Finite Attainment in the Gregory-Leibniz Construction of Pi},
+  pdfauthor={Eduardo Martinez Dammroze},
+  pdfsubject={Kernel-checked ultrafinitary separation between finite attainment and actual completion},
+  pdfkeywords={ultradeterminism, actual infinity, pi, finite construction, circumference closure, formal verification, Lean 4, exact arithmetic}
+}
+
+\setlength{\emergencystretch}{1em}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\newcommand{\Finite}{\mathsf{Finite}}
+\newcommand{\Closed}{\mathsf{Closed}}
+\newcommand{\Terminal}{\mathsf{Terminal}}
+\newcommand{\WaterTight}{\mathsf{WaterTight}}
+\newcommand{\ExternalCompletion}{\mathsf{ActualCompletion}_{\mathrm{ext}}}
+\newcommand{\CompletedTotality}{\mathsf{CompletedTotality}}
+\newcommand{\False}{\bot}
+
+\newcommand{\FiniteRepresentation}{\mathsf{FiniteRepresentation}}
+\newcommand{\FiniteEncoding}{\mathsf{FiniteEncoding}}
+\newcommand{\FiniteExhaustion}{\mathsf{FiniteExhaustion}}
+\newcommand{\FinitePiClosureAttainment}{\mathsf{FinitePiClosureAttainment}}
+\newcommand{\FiniteClosedPiCircle}{\mathsf{FiniteClosedPiCircle}}
+\newcommand{\FiniteWaterTightPiBalloon}{\mathsf{FiniteWaterTightPiBalloon}}
+\newcommand{\FiniteRepresentationBridgesCompletion}{\mathsf{FiniteRepresentationBridgesCompletion}}
+\newcommand{\FiniteEncodingCreatesExactPi}{\mathsf{FiniteEncodingCreatesExactPi}}
+
+\title{Operational vs Semantic Equality:
+A Machine-Checked Separation of Completion and Finite Attainment
+in the Gregory--Leibniz Construction of \(\pi\)}
+\author{
+Eduardo Martinez Dammroze\\
+Independent Researcher, DMZCorp\\
+ORCID: \href{https://orcid.org/0009-0002-9395-7778}{0009-0002-9395-7778}\\
+\href{mailto:dammroze@gmail.com}{dammroze@gmail.com}
+}
+
+\date{Version 1.5.3 --- Foundational Publication Final}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+We do not claim inconsistency of classical real analysis, nonexistence
+of traditional real \(\pi\), or failure of the completed Euclidean
+closure \(G_r(2\pi r)=G_r(0)\).
+In a frozen Lean 4.33.0-rc1 development, the axiom-free finite core
+proves for the Gregory--Leibniz correction family an explicit full-tail
+convergence-to-zero predicate together with failure of finite
+exact-zero attainment and impossibility of a universal finite
+exact-zero witness extractor; a separate classical adversarial layer
+proves that, for \(r\neq0\), no nonempty finite Gregory-generated
+Euclidean traversal stage returns exactly to its starting point.
+We then construct the Gregory rational generator as a concrete Mathlib
+Cauchy sequence and prove
+\[
+\operatorname{Real.mk}(G)=\pi
+\qquad\land\qquad
+\forall n\in\mathbb N,\;(G_n:\mathbb R)\neq\pi,
+\]
+through Mathlib's Cauchy-completion architecture; the resulting
+classical theorem audit reports the external dependencies
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound},
+with no \texttt{sorryAx}.
+The contribution is therefore not the elementary observation that a
+convergent sequence need not attain its limit.  The machine-checked
+separation is sharper: semantic completion is not, by itself, a
+finite-witness extractor.  For the exhibited Gregory family, the local
+full-tail convergence-to-zero predicate coexists with failure of
+finite exact-zero attainment, and no universal finite exact-zero
+witness extractor follows from that semantic zero criterion.  In the
+concrete classical comparison layer this separation is witnessed by
+\[
+\operatorname{Real.mk}(G)=\pi
+\qquad\land\qquad
+\forall n\in\mathbb N,\;(G_n:\mathbb R)\neq\pi.
+\]
+The claim is not that a completion formalism could never carry
+additional finite witness data.  It is that completed semantic
+equality or acceptance of the exhibited full-tail-zero case does not,
+by itself, entail a terminal finite witness for the generating
+process.
+\end{abstract}
+
+
+\section*{Scope of Actual-Completion Notation}
+
+Throughout this final version, any symbol denoting an
+\emph{actual completion} is used only as an external comparison object
+for the foundational position being criticized.
+
+It is not an admissible stage of the ultradeterminist construction.
+
+In particular,
+
+\[
+\mathsf{ActualCompletion}_{\mathrm{ext}}
+\]
+
+does not denote a value reached after sufficiently many finite
+refinements, does not denote a hidden stage \(n=\infty\), and is not
+used to close the circumference proved nonterminal in the central
+V1.4 theorem.
+
+The constructive domain of the central theorem contains only finitely
+generated stages and their finite successors.
+
+Accordingly, the proof of circumference nonclosure depends on
+
+\[
+\Delta C_n
+=
+\frac{(-1)^{n+1}8a}{b(2n+3)}
+\neq0
+\]
+
+for every constructed stage, and not on any property assigned to an
+external completion object.
+
+The external completion notation is retained only to make the
+foundational contrast explicit:
+
+\[
+\boxed{
+\text{finite successor construction}
+\neq
+\text{externally postulated actual completion}.
+}
+\]
+
+No external completion object is admitted as a repair, terminal stage,
+or closure event of the traditional-\(\pi\) circumference construction.
+
+
+
+\section{Introduction}
+
+% V1.5.3 FOUNDATIONAL FRONT-MATTER CORRECTION
+
+\paragraph{Headline.}
+\textbf{Completion is not a finite-witness extractor.}
+
+The foundational issue examined here is whether exact equality in a
+completed semantics, by itself, supplies a finite terminal witness in
+the generating process.  The answer exhibited by the formal
+development is no.  Completed semantic equality and finite
+witness-producing attainment are different predicates, and the former
+does not automatically contain the latter.
+
+The price under examination is therefore named rather than hidden:
+\emph{completion}.  Completion may supply an exact mathematical object
+inside its own semantics.  What it does not supply for free is an
+index \(n\) at which the originating finite process has already
+attained that completed value exactly.
+
+The historical dispute over actual infinity, including the
+Hilbert--Brouwer divide, provides a foundational backdrop to this
+question.  We do not attribute the present Lean vocabulary or the
+specific theorem below to either historical program.  The machine-
+checked claim is narrower and contemporary: whether semantic
+completion of a specific finite generator entails a terminal finite
+attainment witness.
+
+Our test case is the traditional Gregory--Leibniz generator.  In the
+axiom-free finite core, the exact Gregory correction satisfies the
+paper's local explicit full-tail convergence-to-zero predicate while
+remaining nonzero at every finite stage.  The development proves
+\[
+\mathsf{CauchyEqZero}(\Delta\pi)
+\quad\land\quad
+\neg\mathsf{FiniteZeroAttained}(\Delta\pi),
+\]
+and directly refutes the universal implication
+\[
+\forall q,\;
+\mathsf{CauchyEqZero}(q)
+\rightarrow
+\exists n_{\mathrm{finite}}\,
+\mathsf{ExactZero}(q_n).
+\]
+It also proves that no universal function can extract such a finite
+exact-zero index from the local full-tail-zero certificate.
+
+This does not assert that no enriched completion formalism could ever
+store or separately provide finite witness information.  The formal
+result is exactly that semantic zero or completion acceptance of the
+exhibited case, \emph{by itself}, does not imply finite operational
+zero.
+
+The classical adversarial layer deliberately strengthens the
+opponent's resources.  It grants traditional real \(\pi\), standard
+real trigonometry, Mathlib's completed real numbers, the Euclidean
+circle equation \(x^2+y^2=r^2\), and the completed identity
+\[
+G_r(2\pi r)=G_r(0).
+\]
+Even after granting all of these, for nonzero radius every nonempty
+finite Gregory-generated traversal stage remains distinct from the
+starting point:
+\[
+r\neq0
+\quad\Longrightarrow\quad
+G_r(C_n)\neq G_r(0)
+\]
+for every finite paper-stage index \(n\).
+
+The completion boundary is then made concrete.  The rational Gregory
+generator \(G\) is represented as an actual Mathlib Cauchy sequence and
+the development proves
+\[
+\boxed{
+\operatorname{Real.mk}(G)=\pi
+\quad\land\quad
+\forall n\in\mathbb N,\;(G_n:\mathbb R)\neq\pi.
+}
+\]
+The completed value is therefore exact inside the granted classical
+semantics while no finite generator stage attains that value.
+
+The theorem does not say that ``\(\pi\) does not close the circle.''
+The completed Euclidean closure identity remains granted.  The
+machine-checked counterexample concerns the stronger implication
+\[
+\boxed{
+\text{semantic completion}
+\;\Longrightarrow\;
+\text{finite terminal witness}
+}
+\]
+when that implication is demanded without additional witness-producing
+data.  The Gregory construction supplies a concrete case in which the
+left-hand semantic equality holds and the right-hand finite attainment
+does not.
+
+Throughout the paper, machine-style blocks such as
+\texttt{[FINAL\_STATUS]=PASS...} report the certified status of the
+named module or theorem family.  They are scoped audit records, not
+standalone metaphysical claims about all classical or constructive
+mathematics.
+
+This essay therefore does not close the general foundational case
+against actual infinity.  It establishes a finite formal foothold:
+completion can be located, its semantic success can be granted, and
+the absence of a corresponding finite attainment witness can still be
+proved.  V1.5.2 introduced no new formal theorem; V1.5.3 adds the
+finite Euclidean return-to-start barrier and the concrete Mathlib
+completion-provenance result in the classical adversarial layer. The classical bridge deliberately grants Mathlib, host natural and rational numbers, the standard real numbers, classical trigonometry, and traditional \(\pi\). Those resources form an external comparison semantics and are not being reclassified as ultrafinitary.
+
+Accordingly, the relevant formal distinction is:
+\[
+\boxed{\text{reasoning about all represented finite stages}
+\;\neq\;
+\text{exhibiting a terminal finite stage}.}
+\]
+\subsection{Formal dependency map}
+
+The final result is not an isolated wrapper. Its dependency chain is:
+
+\[
+\begin{aligned}
+\text{exact finite arithmetic}
+&\longrightarrow
+\text{nonzero finite correction}
+\\
+&\longrightarrow
+\text{nonterminality}
+\\
+&\longrightarrow
+\text{finite closure obstruction}
+\\
+&\longrightarrow
+\text{completion/attainment separation}
+\\
+&\longrightarrow
+\text{finite representation barrier}.
+\end{aligned}
+\]
+
+The final theorem composes these previously kernel-checked components.
+
+\section{Finite Successor Process}
+
+The primitive stage universe is generated by
+\[
+s_0,\qquad S(s),
+\]
+with no constructor corresponding to an actual-infinite final stage.
+
+A stage is called terminal if
+\[
+S(s)=s.
+\]
+
+\begin{theorem}[No finite terminal stage]
+For every constructible stage $s$,
+\[
+S(s)\neq s.
+\]
+Hence
+\[
+\forall s,\quad \neg\Terminal(s).
+\]
+\end{theorem}
+
+The proof is purely structural induction over the finite stage type.
+
+Consequently,
+\[
+\neg\exists s\; \Terminal(s).
+\]
+
+There is no ``last'' constructible stage.
+
+\section{The Potential \texorpdfstring{$\pi$}{pi} Process}
+
+For an independent finite process associated with the conventional
+Gregory--Leibniz representation, the formal development uses the finite
+terms
+\[
+\Delta_k
+=
+(-1)^k\frac{4}{2k+1}.
+\]
+
+Every denominator is strictly positive by type construction and the
+numerator magnitude is four. Therefore:
+\[
+\boxed{\Delta_k\neq0}
+\]
+for every finite $k$.
+
+Finite partial execution is represented recursively. No completed
+infinite series is represented.
+
+\begin{theorem}[Nonterminality of every finite $\pi$ stage]
+For every finite Gregory--Leibniz stage $s$,
+\[
+\neg\Terminal_\pi(s).
+\]
+\end{theorem}
+
+Equivalently,
+\[
+\boxed{
+\neg\exists s_{\mathrm{finite}}
+\quad
+\Terminal_\pi(s).
+}
+\]
+
+This theorem does not use
+\[
+\sin(\pi)=0
+\]
+or
+\[
+\cos(2\pi)=1.
+\]
+
+It therefore does not derive terminality from the circle closure that
+the investigation is intended to examine.
+
+\section{Finite Circle Closure as an Operational Model}
+
+A finite $\pi$-driven circle carries one finite $\pi$ stage.
+
+The operational criterion is explicit:
+
+\begin{definition}
+A finite $\pi$-driven circle may receive an exact geometric-closure
+certificate only if the $\pi$ process determining its endpoint is
+terminal.
+\end{definition}
+
+Thus:
+\[
+\Closed(C)
+\Longrightarrow
+\Terminal_\pi(s_C).
+\]
+
+Since every finite $\pi$ stage is nonterminal:
+
+\begin{theorem}[No finite exact $\pi$-circle closure]
+\[
+\boxed{
+\neg\exists C_{\mathrm{finite}}
+\quad
+\Closed(C).
+}
+\]
+\end{theorem}
+
+The logical structure is:
+\[
+\Closed(C)
+\Rightarrow
+\Terminal_\pi(s_C)
+\Rightarrow
+\False.
+\]
+
+This is the formal meaning of the term
+\emph{operational quasi-circle} in this work.
+
+
+\section{Legacy Operational Containment Model}
+
+Earlier versions of this work included a finite containment predicate
+as an operational illustration of exact closure certification.  That
+construction remains part of the reproducible artifact history, but it
+is not a Euclidean theorem, not a fluid-mechanics theorem, and not part
+of the V1.5 classical geometric argument.
+
+Within that legacy model, exact containment is defined only after an
+operational closure condition has been supplied.  The corresponding
+Lean result therefore establishes a theorem internal to that model.
+
+V1.5 does not infer from this construction that physical water leaks,
+that pressure containment fails, or that any material system is unsafe.
+The model is retained only to distinguish
+
+\[
+\text{exact-equality certification}
+\]
+
+from
+
+\[
+\text{tolerance-based certification}.
+\]
+
+The principal geometric result of V1.5 is instead the independent
+classical traversal theorem of
+Section~\ref{sec:v15-adversarial-closure}.
+
+
+\section{Completion Is Not Attainment}
+
+The decisive step is to distinguish a finite process from its explicit
+completion extension.
+
+Let
+\[
+\mathcal F
+\]
+denote the finite-stage universe.
+
+We then construct an enlarged type:
+\[
+\mathcal F^+
+=
+\mathcal F
+\cup
+\{\ExternalCompletion\}.
+\]
+
+In Lean this is represented by a genuinely new constructor.
+
+\begin{theorem}[No finite preimage of actual completion]
+\[
+\boxed{
+\forall s\in\mathcal F,
+\quad
+s\neq\ExternalCompletion.
+}
+\]
+\end{theorem}
+
+More strongly, for every finitely encoded number $k$ of refinements,
+\[
+\boxed{
+S^k(s)\neq\ExternalCompletion.
+}
+\]
+
+Thus:
+\[
+\neg\exists k_{\mathrm{finite}}
+\quad
+S^k(s)=\ExternalCompletion.
+\]
+
+If the extended model assigns the completion property to
+$\ExternalCompletion$, then that property is present in the extended
+object while absent from every finite stage.
+
+Consequently:
+\[
+\boxed{
+\text{completion property}
+\neq
+\text{finite attainment result}.
+}
+\]
+
+There exists no mathematically legitimate finite stage corresponding to
+the phrase ``after infinitely many steps, it finally happened.''
+
+There is no ``finally'' indexed by a finite stage.
+
+\section{Completed Totality}
+
+The same distinction is formalized independently of $\pi$.
+
+For a finite successor-generated initial segment with boundary $s$,
+the successor
+\[
+S(s)
+\]
+is constructible and lies outside that segment.
+
+\begin{theorem}[Finite totality self-defeat]
+Every finite candidate totality has a constructible stage outside it:
+\[
+\boxed{
+S(s)\notin T_s.
+}
+\]
+\end{theorem}
+
+Therefore:
+\[
+\boxed{
+\text{finite exhaustion}=\False.
+}
+\]
+
+No finite initial segment exhausts the successor process.
+
+A separate enlarged type contains a constructor
+\[
+\CompletedTotality
+\]
+to which the property ``contains every finite stage'' is assigned.
+
+The formal separation is:
+\[
+\boxed{
+\text{no finite exhaustion}
+}
+\]
+while
+\[
+\boxed{
+\text{completed totality exists in the explicit extension}.
+}
+\]
+
+Furthermore,
+\[
+\boxed{
+\CompletedTotality
+\text{ has no finite origin}.
+}
+\]
+
+\section{Actual Infinity as an External Comparison Semantics}
+
+The formal theorem does not prove Cantorian set theory inconsistent.
+
+It establishes something narrower and logically cleaner.
+
+A completed totality cannot be identified with a stage at which the
+successor process has been exhausted, because:
+\[
+\forall T_{\mathrm{finite}},
+\quad
+\exists S(s)\notin T_{\mathrm{finite}}.
+\]
+
+Accordingly, the passage
+\[
+\text{potentially extendable process}
+\quad\rightsquigarrow\quad
+\text{completed totality}
+\]
+is not finite attainment.
+
+In the formal model it is an explicit extension of the object language.
+
+Hence actual infinity is demoted, under the present ultradeterminist finite-construction
+criterion, from
+\[
+\text{``final result of iteration''}
+\]
+to
+\[
+\boxed{
+\text{additional completion principle}.
+}
+\]
+
+This is an ontological and proof-theoretic separation, not a
+consistency refutation.
+
+\section{Finite Precision and Floating-Point Arithmetic}
+
+The next result is independent of any particular IEEE format.
+
+A generic machine word has arbitrary but finite precision.
+
+No assumption is made about 16-bit, 32-bit, 64-bit, 128-bit, arbitrary
+precision binary, decimal floating-point, or any particular radix.
+
+\begin{theorem}[Finite precision cannot create terminality]
+For every finite representation and every finite increase in precision,
+the represented finite $\pi$ source remains nonterminal.
+\end{theorem}
+
+Therefore:
+\begin{center}
+\fbox{%
+\parbox{0.62\linewidth}{%
+\centering
+\textbf{Finite precision increase does not imply exact closure.}%
+}%
+}
+\end{center}
+
+The result permits:
+\[
+\text{higher precision}
+\Rightarrow
+\text{smaller numerical error}.
+\]
+
+It forbids the inference:
+\[
+\text{higher but finite precision}
+\Rightarrow
+\text{actual completion}.
+\]
+
+Hence:
+\[
+\boxed{
+\text{smaller error}\neq\text{zero structural obstruction}.
+}
+\]
+
+No claim is made that numerical error monotonically increases with the
+number of bits. Such a claim would be false in general.
+
+The stronger and correct theorem is representation-independent.
+
+\section{Finite Representation Barrier}
+
+Let $\Sigma$ be an arbitrary symbol alphabet.
+
+A finite representation is an inductively finite word:
+\[
+w\in\Sigma^\ast.
+\]
+
+The encoding may be replaced by another finite encoding over an entirely
+different alphabet.
+
+The source mathematical stage remains the same.
+
+\begin{theorem}[Finite re-encoding cannot create source terminality]
+No finite encoding, re-encoding, radix change, finite code growth, or
+finite precision increase transforms a nonterminal finite $\pi$ source
+into actual completion.
+\end{theorem}
+
+Symbolically:
+\[
+\boxed{
+\FiniteRepresentation
+\not\Rightarrow
+\ExternalCompletion.
+}
+\]
+
+and:
+\[
+\boxed{
+\FiniteEncoding
+\not\Rightarrow
+\Terminal_\pi.
+}
+\]
+
+Thus representation can encode, approximate, compress, expand, or
+rename finite information.
+
+It cannot manufacture terminality that is absent from the source.
+
+\section{Final Kernel-Checked Barrier}
+
+The final Lean structure
+\texttt{UltrafinitaryPiBarrier} certifies simultaneously:
+
+\begin{align}
+\neg\FiniteExhaustion, \\
+\neg\FinitePiClosureAttainment, \\
+\neg\FiniteClosedPiCircle, \\
+\neg\FiniteWaterTightPiBalloon, \\
+\neg\FiniteRepresentationBridgesCompletion, \\
+\neg\FiniteEncodingCreatesExactPi,
+\end{align}
+while the explicitly extended universes contain designated completion
+objects.
+
+The final conjunction is:
+
+\[
+\boxed{
+\begin{aligned}
+&\neg\FiniteExhaustion
+\;\land\;
+\neg\FinitePiClosureAttainment
+\\[2pt]
+&\qquad\land\;
+\neg\FiniteRepresentationBridgesCompletion
+\;\land\;
+\neg\FiniteWaterTightPiBalloon.
+\end{aligned}
+}
+\]
+
+This theorem was kernel checked with no external mathematical library.
+
+
+\section{What Has Been Proved}
+
+The strongest unconditional result in this work is the finite
+attainment/completion separation and its associated exact arithmetic
+barriers. Geometric endpoint non-closure is a conditional theorem:
+it follows for a concrete finite endpoint geometry once that geometry
+independently supplies the audited bridge from endpoint equality to
+finite arithmetic terminality.
+
+Accordingly, no result below should be read as silently identifying an
+operational seam model with classical Euclidean geometry.
+
+
+
+Within the formal regime defined in this work:
+
+\begin{enumerate}[label=\arabic*.]
+\item Every stage of the successor process defined here has a distinct successor.
+
+\item No finite stage is its own successor.
+
+\item No finite candidate totality exhausts the successor process.
+
+\item Every finite stage of the adopted Gregory--Leibniz $\pi$ process
+      has a nonzero next correction.
+
+\item No such finite $\pi$ stage is terminal.
+
+\item Exact operational circle closure implies $\pi$-terminality.
+
+\item Therefore no finite stage obtains an exact operational
+      $\pi$-circle closure certificate.
+
+\item A legacy operational containment predicate is kernel-checked within its stated model.
+
+\item That operational model is not used as a proof of classical Euclidean or physical non-closure.
+
+\item An externally added comparison-completion object has no finite preimage.
+
+\item Closure assigned to that object is not attained by any finite
+      refinement.
+
+\item A completed totality has no finite-exhaustion origin.
+
+\item No finite encoding or precision increase creates terminality,
+      or actual completion.
+\end{enumerate}
+
+
+\subsection*{V1.5 adversarial additions}
+
+In addition to the ultradeterminist finite-stage result, V1.5 now
+formally establishes the following:
+
+\begin{itemize}
+\item arbitrary finite refinement depth can coexist with an exactly
+      nonzero residual;
+\item an externally granted classical limit claim does not imply a
+      finite exact attainment witness;
+\item every finite Gregory stage is distinct from classical real
+      $\pi$ in the external classical layer;
+\item for nonzero $r$, every finite Gregory circumference stage is
+      distinct from the classical value $2r\pi$;
+\item the Gregory correction is exactly the difference between the
+      corresponding consecutive Gregory stages;
+\item the corresponding circumference correction is exactly the
+      difference between consecutive circumference stages;
+\item the classical traversal points are genuine elements of
+      $\mathbb R^2$ satisfying $x^2+y^2=r^2$; and
+\item consecutive finite Gregory-generated Euclidean traversal
+      endpoints are never equal.
+\end{itemize}
+
+None of these statements denies the classical limit theorem or the
+closure of the completed classical circle.
+
+
+
+\subsection*{V1.5.1 constructive full-tail addition}
+
+The additional finite-core development proves, for the exact
+Gregory--Leibniz correction family, all of the following simultaneously:
+\[
+\mathsf{CauchyEqZero}(\Delta\pi),
+\]
+\[
+\forall n_{\mathrm{finite}},
+\qquad
+\neg\mathsf{ExactZero}(\Delta\pi_n),
+\]
+and therefore
+\[
+\neg\left(
+\forall q,\;
+\mathsf{CauchyEqZero}(q)
+\rightarrow
+\exists n_{\mathrm{finite}}\,
+\mathsf{ExactZero}(q_n)
+\right).
+\]
+
+It additionally proves that there is no universal finite witness
+extractor taking a proof of the full-tail zero criterion to an exact
+finite zero stage.
+
+Throughout this paper, \(\mathsf{CauchyEqZero}\) denotes only the
+local explicit full-tail convergence-to-zero predicate defined in the
+finite core. It is not a general equality relation, and it is not
+asserted to be the literal equality implementation of any particular
+constructive-real library.
+
+
+\section{What Has Not Been Proved}
+
+Scientific interpretation requires equally explicit negative statements.
+
+This development does \emph{not} prove:
+
+\begin{enumerate}[label=\arabic*.]
+\item that classical real analysis is inconsistent;
+
+\item that Cantorian set theory is inconsistent;
+
+\item that the conventional real number $\pi$ does not exist inside the
+      classical real-number model;
+
+\item that the classical theorem
+      \[
+      \gamma(0)=\gamma(2\pi)
+      \]
+      is false inside its standard real-analytic semantics;
+
+\item that physical water literally escapes from an ideal mathematical
+      curve according to fluid dynamics;
+
+\item that increasing floating-point precision necessarily increases
+      numerical error.
+\end{enumerate}
+
+What is proved is a separation of semantic regimes:
+\[
+\boxed{
+\text{classical completed-object equality}
+\neq
+\text{finite constructive attainment}.
+}
+\]
+
+
+
+
+\section{Relation to Strict Finitism, Feasibility, and Predicative Arithmetic}
+\label{sec:prior-ultrafinitist-literature}
+
+The foundational distinction pursued here does not begin with this
+essay.  There is an established literature questioning the unrestricted
+identification of formal existence with effective or feasible
+construction.
+
+Yessenin--Volpin developed an ultra-intuitionistic and
+antitraditional foundational program in which feasibility and
+constructibility play a central role
+\cite{YesseninVolpin1970}.
+Parikh's \emph{Existence and Feasibility in Arithmetic} explicitly asks
+what is meant by asserting the existence of numerals whose production
+is not practically feasible and became a foundational source for later
+work on feasible and bounded arithmetic
+\cite{Parikh1971}.
+Sazonov subsequently developed formal treatments of feasible numbers
+\cite{Sazonov1995}.
+Nelson's \emph{Predicative Arithmetic} developed a mathematically
+substantial arithmetic in a deliberately weak logical environment,
+without the unrestricted induction principle
+\cite{Nelson1986}.
+
+The present contribution therefore does \emph{not} claim to invent
+strict finitism, ultrafinitism, feasibility mathematics, predicative
+arithmetic, or the distinction between potential and actual infinity.
+
+Its narrower contribution is different:
+\[
+\boxed{
+\begin{minipage}{0.90\linewidth}
+to construct a kernel-audited formal separation between finite
+attainment and actual completion for a concrete traditional
+Gregory--Leibniz $\pi$ process, and then to test that separation
+adversarially after explicitly granting classical limit semantics,
+classical real $\pi$, and classical Euclidean trigonometric geometry.
+\end{minipage}
+}
+\]
+
+The resulting comparison is therefore not ``ultrafinitism versus an
+unstated caricature of analysis.''  Both semantic layers are made
+explicit and their conclusions are kept separate.
+
+
+\section{Institutional Settlement Without Foundational Closure}
+
+This essay adopts an explicitly critical interpretation of the
+historical settlement of the foundational dispute surrounding actual
+infinity, formalism, and intuitionism.
+
+The claim is not that mathematical institutions possess no legitimate
+role in verification. They plainly do. Nor is the claim that every
+heterodox proposal rejected by a mathematical community is correct.
+Most unconventional proposals may be false.
+
+The narrower claim is:
+
+\[
+\boxed{
+\text{institutional acceptance}
+\neq
+\text{mathematical proof}
+}
+\]
+
+and, conversely,
+
+\[
+\boxed{
+\text{institutional rejection}
+\neq
+\text{mathematical refutation}.
+}
+\]
+
+This distinction is particularly important when the dispute concerns
+the standards by which mathematical existence and proof are themselves
+to be judged.
+
+\subsection{Brouwer versus Hilbert}
+
+L. E. J. Brouwer's intuitionism and David Hilbert's foundational
+program did not differ merely over technical details. They disagreed
+about mathematical existence, the status of logic, the legitimacy of
+nonconstructive reasoning, and the standing of completed infinitary
+objects.
+
+In Brouwer's intuitionism, mathematical truth is tied to mathematical
+construction. The unrestricted classical principle of excluded middle
+is consequently rejected in contexts where no corresponding
+construction is available. Intuitionism became a systematic
+alternative foundation rather than merely a philosophical objection
+to particular classical proofs
+\cite{SEPIntuitionism,SEPConstructiveMathematics}.
+
+Hilbert pursued a different objective. His program sought to preserve
+classical and ideal mathematics by formalizing it axiomatically and
+then securing it by consistency proofs carried out through finitistic
+metamathematical means \cite{SEPHilbertProgram}.
+
+Schematically, the foundational opposition may be represented as
+
+\[
+\boxed{
+\text{Brouwer: existence requires construction}
+}
+\]
+
+against the Hilbertian strategy
+
+\[
+\boxed{
+\text{ideal mathematics may be retained if formally secured}.
+}
+\]
+
+These are foundational alternatives. The historical predominance of
+one does not itself constitute a theorem against the other.
+
+\subsection{The Grundlagenstreit Was Not Closed by a Refutation of Brouwer}
+
+There is no historical theorem of the form
+
+\[
+\text{intuitionism}\Longrightarrow\bot.
+\]
+
+Brouwer's program was not displaced because intuitionistic mathematics
+was proved inconsistent.
+
+Indeed, intuitionism did not disappear. Heyting formalized
+intuitionistic logic, constructive mathematics developed multiple
+subsequent traditions, and intuitionistic systems remain active
+subjects of mathematical and logical research
+\cite{SEPIntuitionism,SEPConstructiveMathematics}.
+
+The historical conflict therefore requires a distinction between
+
+\[
+\text{loss of institutional dominance}
+\]
+
+and
+
+\[
+\text{mathematical refutation}.
+\]
+
+They are not equivalent.
+
+\subsection{The Mathematische Annalen Conflict}
+
+The distinction becomes particularly sharp in the events of 1928--1929
+surrounding the editorial board of \emph{Mathematische Annalen}.
+
+Historical documentation summarized by the Stanford Encyclopedia of
+Philosophy reports that Hilbert, fearing that Brouwer might become too
+influential after Hilbert's death, moved to remove Brouwer from the
+board. The same historical account characterizes the procedure as
+irregular, records Einstein's refusal to support Hilbert's action, and
+notes that other board members were reluctant to oppose Hilbert.
+The board was ultimately dissolved and reconstituted without Brouwer
+\cite{SEPBrouwer}.
+
+The conflict also occurred immediately after a serious disagreement
+between Brouwer and Hilbert concerning German participation in the 1928
+Bologna International Congress of Mathematicians, against the political
+background produced by the First World War
+\cite{SEPBrouwer}.
+
+None of this proves Brouwer mathematically correct.
+
+But neither was it a mathematical proof against Brouwer.
+
+One of the decisive episodes that ended the public
+\emph{Grundlagenstreit} therefore involved editorial authority,
+institutional influence, personal conflict, and international politics
+in addition to mathematics.
+
+This essay consequently adopts the following historical interpretation:
+
+\begin{center}
+\textbf{The institutional war was won more decisively than the
+foundational argument was.}
+\end{center}
+
+That statement is offered as an interpretation of documented history,
+not as a theorem of the Lean development.
+
+\subsection{Gödel and the Narrative of Hilbertian Victory}
+
+The subsequent history makes any simple narrative of a definitive
+Hilbertian scientific victory even more difficult to maintain.
+
+Gödel's incompleteness theorems placed fundamental limitations on the
+original Hilbert program. The second incompleteness theorem obstructed,
+under the relevant formalizability conditions, precisely the kind of
+internal finitistic consistency justification envisioned for
+sufficiently strong systems. Historians and philosophers continue to
+distinguish the original Hilbert program from later relativized and
+modified programs, but the original objective was not simply completed
+as intended \cite{SEPHilbertProgram,SEPGodelHilbert}.
+
+This does not prove Brouwer right.
+
+It does establish that
+
+\[
+\boxed{
+\text{Hilbert's institutional ascendancy}
+\neq
+\text{final mathematical validation of Hilbert's program}.
+}
+\]
+
+The historical dispute ended more cleanly than the mathematical and
+foundational questions did.
+
+\subsection{Institutional Conservatism and Gatekeeping}
+
+Academic mathematical communities are indispensable mechanisms for
+criticism, preservation, education, and verification. They are also
+human institutions.
+
+They develop dominant languages, accepted foundations, publication
+channels, reputational hierarchies, professional incentives, and
+expectations concerning what a legitimate mathematical argument should
+look like.
+
+Once a foundational framework becomes dominant, a proposal attacking
+that framework can face a structurally different burden from a result
+produced within it.
+
+The practical questions may cease to be only
+
+\[
+\text{Is this argument correct?}
+\]
+
+and may additionally become
+
+\[
+\text{Does it speak the accepted language?}
+\]
+
+\[
+\text{Does it preserve the mathematics already valued?}
+\]
+
+\[
+\text{Does it challenge assumptions on which existing research
+programs depend?}
+\]
+
+This produces institutional inertia.
+
+Such inertia is understandable. Radical proposals are frequently
+wrong. Verification is expensive. Familiar frameworks have accumulated
+enormous practical success.
+
+But conservatism is not epistemic authority.
+
+\[
+\boxed{
+\text{skepticism is legitimate;}
+\qquad
+\text{authority is not proof}.
+}
+\]
+
+\subsection{Ramanujan: Recognition Depends on Access}
+
+Srinivasa Ramanujan illustrates a different but related problem:
+access to competent recognition.
+
+Before his correspondence with G. H. Hardy, Ramanujan attempted to
+interest E. W. Hobson and H. F. Baker in his work and received no
+reply. M. J. M. Hill gave a partially encouraging assessment but failed
+to understand important parts of Ramanujan's treatment of divergent
+series. When Ramanujan's work finally reached Hardy in 1913, Hardy and
+Littlewood examined it seriously, and Hardy rapidly recognized that
+some of the results were new and important
+\cite{MacTutorRamanujan}.
+
+The lesson is not that academia rejected Ramanujan for decades after a
+competent examination. It did not.
+
+The more precise lesson is that mathematical content may exist before
+institutional recognition, and that recognition may depend heavily on
+which gatekeeper receives the work and whether that person possesses
+both the competence and willingness to examine something originating
+outside conventional channels.
+
+Thus:
+
+\[
+\boxed{
+\text{truth can precede recognition}.
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{absence of recognition}
+\not\Rightarrow
+\text{absence of mathematical content}.
+}
+\]
+
+\subsection{Cantor: The Irony of Yesterday's Heterodoxy Becoming Today's Orthodoxy}
+
+Cantor is especially important to the present essay because this work
+openly opposes a central Cantorian commitment: actual infinity.
+
+Yet Cantor himself was once a foundational innovator confronting
+substantial resistance.
+
+The early development of set theory and infinitary constructions
+generated constructivist objections, notably from Kronecker, and
+significant disputes over the legitimacy of infinitary methods and
+completed totalities \cite{SEPEarlySetTheory}.
+
+Set theory subsequently became one of the principal foundational
+languages of modern mathematics.
+
+This creates an important methodological irony.
+
+Cantor represents precisely the kind of mathematician whose radical
+foundational proposal should not have been dismissed merely because it
+conflicted with established intuitions.
+
+And this essay now challenges Cantor.
+
+There is no contradiction in those positions.
+
+\begin{center}
+\textbf{I oppose Cantor's answer; I do not oppose Cantor's right to ask
+the question.}
+\end{center}
+
+Indeed, the same standard should apply in both directions.
+
+Cantor should not have been rejected merely because his infinity
+violated the mathematical instincts of predecessors.
+
+Brouwer should not have been marginalized merely because his
+constructionism threatened mathematical methods his contemporaries
+wished to preserve.
+
+And this essay should not be rejected merely because it reopens a
+foundational decision that later became orthodox.
+
+The correct standard in all three cases is:
+
+\[
+\boxed{
+\text{examine the argument}.
+}
+\]
+
+Yesterday's heterodoxy becoming today's orthodoxy is a historical
+transition, not a mathematical theorem.
+
+\subsection{The Author's Interpretation of the Academic Settlement}
+
+I understand the dominant twentieth-century mathematical community to
+have taken a side in practice.
+
+Classical logic, axiomatic set theory, and completed infinite structures
+became the mainstream working environment. Brouwer's intuitionism did
+not become the governing foundation of mainstream mathematics.
+
+That historical choice enabled extraordinarily powerful mathematics.
+
+This essay nevertheless refuses to identify practical dominance with
+proof of foundational necessity.
+
+The historical record demonstrates that foundational mathematics has
+developed inside institutions possessing authority, incentives,
+traditions, and inertia. Ideas can be resisted, misunderstood, ignored,
+marginalized, or fail to reach a person capable of evaluating them.
+
+Brouwer, Ramanujan, and---ironically for the argument advanced
+here---Cantor illustrate different forms of this problem.
+
+The claim is not
+
+\[
+\text{the establishment rejected it}
+\Longrightarrow
+\text{it must be true}.
+\]
+
+That inference would be as invalid as its opposite.
+
+The claim is instead
+
+\[
+\boxed{
+\text{historical dominance}
+\not\Rightarrow
+\text{foundational closure}.
+}
+\]
+
+The fact that ZFC and classical mathematics became dominant is an
+important historical fact.
+
+It does not by itself demonstrate that every foundational objection
+displaced along the way was mathematically answered.
+
+\subsection{Independent Authorial Position}
+
+This work was developed independently of an academic degree program,
+institutional research agenda, or requirement to conform to a
+prevailing foundational school.
+
+It does not ask institutional consensus to function as proof authority.
+
+No theorem in this essay is offered as true because a university,
+journal, historical school, or mathematical majority accepts it.
+
+Conversely, no formal theorem should be considered false merely because
+it conflicts with assumptions that have become standard.
+
+The standard demanded here is
+
+\[
+\boxed{
+\begin{aligned}
+&\text{explicit definitions}\\
++{}&\text{explicit assumptions}\\
++{}&\text{exact derivation}\\
++{}&\text{reproducible verification}.
+\end{aligned}
+}
+\]
+
+If an argument fails, identify the failure.
+
+If a bridge is missing, identify the bridge.
+
+If a definition contains its conclusion, expose the circularity.
+
+If an axiom performs essential work, expose the axiom.
+
+If a counterexample exists, construct it.
+
+Institutional history is not a substitute for any of these operations.
+
+\begin{center}
+\textbf{This essay asks to be refuted mathematically, not accepted
+institutionally.}
+\end{center}
+
+Its governing principle is therefore:
+
+\begin{center}
+\textbf{Do not ask which school won. Ask what can actually be proved.}
+\end{center}
+
+
+\section{A Foundational Target: Cantor, Hilbert, and ZFC}
+
+One foundational target of this essay is explicit. The present
+treatment is not claimed to exhaust the historical, mathematical, or
+metamathematical questions surrounding actual infinity. It is not numerical
+approximation as such, but the promotion from indefinitely extendable
+finite construction to actually completed infinite totality.
+
+Within the finite successor regime formalized here, every attained
+finite candidate totality admits a further successor outside that
+candidate. Thus finite continuation does not itself produce finite
+exhaustion.
+
+The central distinction is
+
+\[
+\boxed{
+\text{indefinitely extensible finite construction}
+\neq
+\text{actually completed totality}
+}
+\]
+
+A completed totality may nevertheless be introduced by extending the
+ontology of the mathematical framework. What does not follow from that
+extension is that the completed object was attained as a final finite
+stage of the process that motivated it.
+
+This paper therefore attacks the foundational legitimacy of treating
+actual completion as though it were merely the eventual culmination of
+a finite generative process.
+
+\subsection*{Cantor}
+
+Cantor did not accidentally confuse potential and actual infinity. The
+distinction was deliberate, and actual infinity was explicitly granted
+mathematical legitimacy.
+
+The disagreement here is therefore foundational rather than
+exegetical.
+
+The present formal regime rejects the inference that indefinite finite
+extendability, by itself, warrants promotion to an actually completed
+totality.
+
+Accordingly, the criticism is not that Cantor failed to recognize the
+difference between potential and actual infinity. It is that this work
+does not accept the additional ontological commitment merely because a
+classical framework permits it.
+
+\[
+\boxed{
+\text{potential continuation}
+\not\Rightarrow
+\text{actual completion}
+}
+\]
+
+\subsection*{Hilbert}
+
+Hilbert's foundational position is not identical to Cantor's and is not
+treated as such here. His finitistic metamathematical program and his
+use of ideal mathematical elements form a more nuanced architecture.
+
+The present criticism targets the point at which mathematical objects
+without finite attainment acquire legitimate deductive standing as
+ideal objects.
+
+The question is therefore not whether such objects are useful. Many
+are. The question is whether their formal usefulness supplies the
+finite provenance that their motivating constructions do not.
+
+\[
+\boxed{
+\text{ideal legitimacy}
+\neq
+\text{finite provenance}
+}
+\]
+
+\subsection*{ZFC}
+
+ZFC supplies an axiomatic framework in which completed infinite sets
+are legitimate mathematical objects. This work challenges any
+identification of that axiomatic availability with constructive or
+finite attainment.
+
+The distinction is
+
+\[
+\boxed{
+\text{axiomatic existence}
+\neq
+\text{finite attainment}
+}
+\]
+
+The kernel-checked development presented here does not derive a
+contradiction from the axioms of ZFC and therefore does not claim a
+formal inconsistency proof of ZFC.
+
+Its criticism is instead foundational and ontological: an actually
+completed object permitted by an axiomatic framework does not thereby
+acquire a final finite construction stage, finite origin, or finite
+attainment witness.
+
+\subsection*{Ontological Debt}
+
+This paper uses the term \emph{ontological debt} for precisely this
+additional commitment.
+
+If a completed object
+
+\begin{enumerate}
+\item has no final finite generating stage,
+\item has no finite preimage in the generating process,
+\item cannot be obtained by any finite representation increase, and
+\item is nevertheless admitted as a completed mathematical object,
+\end{enumerate}
+
+then its completed status belongs to the ontology of the extended
+framework rather than to the finite history of the construction.
+
+This does not make the extended framework syntactically inconsistent.
+It identifies an additional foundational commitment that must be
+distinguished from finite attainment.
+
+\[
+\boxed{
+\text{consistently postulated}
+\neq
+\text{finitely attained}
+}
+\]
+
+The burden of explanation is therefore reversed. Completion is not
+treated here as the default object whose legitimacy requires no further
+analysis. Completion is the additional commitment.
+
+If a mathematical framework requires an actually completed object where
+every constructive stage remains nonterminal, then the completion
+belongs to the framework's ontology, not to the finite history of the
+construction.
+
+
+\section{Cantor, Hilbert, Brouwer, Heyting, and Bishop}
+
+The result interacts differently with several foundational positions.
+
+Cantorian actual infinity treats completed infinite totalities as
+legitimate mathematical objects.
+
+The present formal development shows that such a completed totality is
+not the result of exhausting a finite successor construction.
+
+Hilbert's program is subtler. Hilbert explicitly distinguished ideal
+elements from finitistically meaningful reasoning. The result therefore
+does not reduce simply to an anti-Hilbert statement; instead, it
+sharpens the distinction:
+\[
+\boxed{
+\text{ideal completion}\neq\text{finite witness}.
+}
+\]
+
+Brouwerian and Heyting intuitionism reject unrestricted classical
+reasoning but do not necessarily adopt the ultrafinitary restriction
+used here.
+
+Bishop-style constructive analysis likewise permits infinite
+constructions under constructive control.
+
+The formal regime of this work is therefore intentionally stronger:
+only explicitly finite stages inhabit the operational universe, and no
+actual-infinite terminal object is silently admitted.
+
+
+\section{Ontological Debt}
+
+The formal results permit a sharper foundational interpretation.
+
+A successor process can always be extended:
+\[
+\forall s_{\mathrm{finite}},
+\qquad
+S(s)\neq s.
+\]
+
+A finite candidate totality with boundary \(s\) necessarily omits
+\(S(s)\). Hence:
+\[
+\boxed{
+\text{finite exhaustion is impossible}.
+}
+\]
+
+Nevertheless, the extended formal universe may contain an object
+designated as a completed totality.
+
+The decisive point is that this object is not obtained at a final
+finite stage:
+\[
+\boxed{
+\CompletedTotality
+\notin
+\operatorname{Image}(\text{finite construction}).
+}
+\]
+
+We call the resulting gap \emph{ontological debt}.
+
+\begin{definition}[Ontological debt]
+A formalism incurs ontological debt when a property assigned to a
+completed object has no finite construction stage, finite preimage, or
+finite attainment witness inside the process invoked to motivate that
+object.
+\end{definition}
+
+The phrase does not mean logical inconsistency. It identifies an
+additional ontological commitment.
+
+Thus the formal distinction is:
+\[
+\boxed{
+\text{existence by completion}
+\neq
+\text{existence by finite attainment}.
+}
+\]
+
+In particular, a completed totality is not the ``last member'' of the
+finite process. The formal process has no such last member.
+
+
+\section{Classical Convergence Is Granted; Finite Attainment Is a Different Predicate}
+\label{sec:convergence-versus-attainment}
+
+A central clarification of the present version is that the classical
+$\varepsilon$--$N$ definition of convergence is \emph{not} disputed.
+For a real sequence $(x_n)$ and a real number $L$, classical analysis
+writes
+\[
+x_n\longrightarrow L
+\]
+when
+\[
+\forall \varepsilon>0\;
+\exists N\;
+\forall n\ge N,\qquad
+|x_n-L|<\varepsilon.
+\]
+The universal quantifier over every positive $\varepsilon$ is essential.
+The present argument does not replace it by a single fixed numerical
+tolerance, and it does not infer from finite non-attainment that
+classical convergence is false.
+
+The distinction investigated here is instead between the two
+propositions
+\[
+\operatorname{Converges}(x,L)
+\]
+and
+\[
+\operatorname{Attains}(x,L)
+\;:\Longleftrightarrow\;
+\exists n\; x_n=L.
+\]
+They are not logically equivalent.  Classical analysis itself provides
+many sequences for which the first proposition is true and the second
+is false.
+
+\subsection{A control example accepted rather than rejected}
+
+Consider the finite dyadic partial process
+\[
+S_n
+=
+\frac12+\frac14+\cdots+\frac{1}{2^{n+1}}
+=
+1-\frac{1}{2^{n+1}}.
+\]
+Classically,
+\[
+S_n\longrightarrow1.
+\]
+This essay accepts that theorem.  At every finite stage, however,
+\[
+1-S_n=\frac{1}{2^{n+1}}\neq0,
+\]
+so
+\[
+S_n\neq1.
+\]
+Thus arbitrarily deep finite refinement and absence of exact finite
+attainment coexist without contradiction.
+
+The Lean module
+\texttt{ArbitraryPrecisionWithoutAttainment.lean} formalizes this
+control situation using a purely finite recursively generated
+denominator.  It proves both that every requested finite refinement
+depth is reachable and that the exact residual at every such stage is
+nonzero.  In particular, it establishes the formal separation
+\[
+\neg\Bigl(
+  \operatorname{ArbitraryFinitePrecision}
+  \rightarrow
+  \operatorname{ExactFiniteAttainment}
+\Bigr)
+\]
+inside the control model.
+
+\subsection{Granting an external limit does not create a finite stage}
+
+The module
+\texttt{ExternalLimitAttainmentBoundary.lean} deliberately allows an
+external proposition
+\[
+\mathsf{LimitClaim}
+\]
+to stand for a limit theorem supplied by a richer classical semantics.
+The theorem does not deny that proposition.  Instead it proves that,
+even when $\mathsf{LimitClaim}$ is explicitly granted, it does not imply
+a finite traditional-$\pi$ circumference stabilization witness and does
+not imply eventual finite stabilization.
+
+Accordingly, the claim of this essay is not
+\[
+\text{``classical convergence is false.''}
+\]
+It is the narrower separation
+\[
+\boxed{
+\text{classical convergence, even when granted, is not a finite
+attainment event.}
+}
+\]
+
+This distinction is the precise role formerly expressed more loosely
+by the phrase ``tolerance is not equality.''  Numerical tolerances
+remain legitimate engineering tools; they are simply not being used
+here as substitutes for the separate predicate of exact finite
+attainment.
+
+
+\section{Finite Re-encoding Cannot Create Source Terminality}
+
+The formal development ultimately removes floating-point arithmetic
+from the center of the argument.
+
+Floating point is only one instance of a finite encoding.
+
+For an arbitrary finite alphabet \(\Sigma\), let
+\[
+w\in\Sigma^\ast
+\]
+be a finite word encoding a finite mathematical source.
+
+The Lean theorem proves that replacing \(w\) by another finite word,
+enlarging it, changing radix, or increasing finite precision cannot
+transform a nonterminal source into the explicitly added completion
+object.
+
+Thus:
+\[
+\boxed{
+\text{representation growth}
+\not\Rightarrow
+\text{mathematical terminality}.
+}
+\]
+
+Higher precision may reduce numerical error. The formal development
+does not deny this.
+
+What it excludes is:
+\[
+\boxed{
+\text{finite precision growth}
+\Rightarrow
+\text{creation of exact completion}.
+}
+\]
+
+The strongest conclusion is therefore not an attack on a specific
+IEEE format. It is representation-independent:
+
+\begin{center}
+\begin{minipage}{0.82\linewidth}
+\centering
+\textbf{A finite representation cannot manufacture exactness absent
+from its mathematical source.}
+\end{minipage}
+\end{center}
+
+\section{Kernel Auditing as a Foundational Instrument}
+
+Modern proof assistants make the foundational dispute auditable at a
+level unavailable to purely rhetorical foundational argument.
+
+For the final theorem the checked dependency profile is:
+
+\begin{verbatim}
+[NAT_USED]=NO
+[HOST_INT_USED]=NO
+[HOST_RAT_USED]=NO
+[HOST_FLOAT_USED]=NO
+[MATHLIB_USED]=NO
+[PROPEXT]=NO
+[CLASSICAL_CHOICE]=NO
+[QUOT_SOUND]=NO
+[SORRYAX]=NO
+\end{verbatim}
+
+The importance of these flags is methodological.
+
+Instead of asking whether a proof is ``finitist'' or ``classical'' by
+philosophical description alone, one can inspect the actual logical
+dependencies accepted by the kernel.
+
+The relevant question becomes:
+
+\begin{quote}
+At exactly which formal step does a completion object enter that was
+not previously attainable by the finite construction?
+\end{quote}
+
+In the present development, that transition is explicit.
+
+It is a new constructor.
+
+The kernel therefore allows the distinction
+\[
+\boxed{
+\text{ideal completion}
+\neq
+\text{finite witness}
+}
+\]
+to be represented as formal structure rather than philosophical
+metaphor.
+
+
+\section{Adversarial Objections}
+
+Several immediate objections help clarify the exact scope of the result.
+
+\paragraph{Objection 1: ``But \(\pi\) is an exact symbol.''}
+
+Yes. Symbolic exactness is not disputed. The symbol \(\pi\) can denote
+an exact object inside a mathematical language. The question studied
+here is whether writing that symbol supplies a finite operational
+attainment witness. It does not.
+
+\[
+\text{exact notation}
+\neq
+\text{finite execution witness}.
+\]
+
+\paragraph{Objection 2: ``But a Euclidean circle is closed by
+definition.''}
+
+Yes, inside standard Euclidean semantics. That establishes closure in
+the completed model. It does not independently demonstrate that an
+explicit finite construction has attained the same completion without
+using the closure semantics already built into the model.
+
+\paragraph{Objection 3: ``But taking the limit solves the problem.''}
+
+A limit may provide the mathematically legitimate completed object in
+the classical framework. The present result asks a prior question:
+which finite stage is that completed object?
+
+The formal answer is:
+\[
+\boxed{\text{none}.}
+\]
+
+Thus a limit may define or justify completion, but completion is still
+not a final finite stage of the generating process.
+
+\paragraph{Objection 4: ``But arbitrary precision makes the error as
+small as required.''}
+
+That is compatible with the formal result. Higher finite precision may
+reduce numerical error dramatically.
+
+What does not follow is:
+\[
+|\delta|<\varepsilon
+\quad\Longrightarrow\quad
+\delta=0.
+\]
+
+Nor does increasing a finite representation transform its finite source
+into the externally added comparison-completion object.
+
+
+\section{Adversarial Soundness and Non-Circularity Audit}
+
+\subsection*{Lemma (Closure-Interface Independence)}
+
+Let \(G\) be a finite endpoint geometry associated with a finitely
+generated stage \(s\). Define endpoint closure solely by
+
+\[
+\operatorname{EndpointClosed}_{G}(s)
+\;:\Longleftrightarrow\;
+\operatorname{finish}_{G}(s)
+=
+\operatorname{start}_{G}(s).
+\]
+
+This definition contains no occurrence of \(\pi\),
+\texttt{TraditionalPiTerminal}, or any proposition asserting finite
+termination of the arithmetic generator associated with \(\pi\).
+
+Any implication
+
+\[
+\operatorname{EndpointClosed}_{G}(s)
+\Longrightarrow
+\operatorname{TraditionalPiTerminal}(s)
+\]
+
+must therefore be supplied separately by an independently established
+bridge,
+
+\[
+B_G :
+\operatorname{PiTerminalClosureBridge}(G).
+\]
+
+Consequently, finite \(\pi\)-terminality is not definitionally encoded
+into the endpoint-closure predicate.
+
+\subsection*{Corollary (Conditional Finite Endpoint Non-Stabilization)}
+
+For any finite endpoint geometry \(G\), if an independent bridge
+\(B_G\) has been established, then
+
+\[
+B_G
+\Longrightarrow
+\forall s,\;
+\neg\operatorname{EndpointClosed}_{G}(s),
+\]
+
+because the independent arithmetic theorem already establishes
+
+\[
+\forall s,\;
+\neg\operatorname{TraditionalPiTerminal}(s).
+\]
+
+The logical chain is therefore
+
+\[
+\operatorname{EndpointClosed}_{G}(s)
+\xRightarrow{\;B_G\;}
+\operatorname{TraditionalPiTerminal}(s),
+\]
+
+together with
+
+\[
+\neg\operatorname{TraditionalPiTerminal}(s),
+\]
+
+and hence
+
+\[
+\neg\operatorname{EndpointClosed}_{G}(s).
+\]
+
+\subsection*{Non-Circularity Statement}
+
+A theorem about \(\pi\) necessarily refers to \(\pi\). Such reference is
+not circular reasoning. Petition of principle would occur if the desired
+terminality or non-closure conclusion were already encoded in the
+definition of closure, or if it were silently assumed inside the bridge
+used to derive it.
+
+The formal interface eliminates the first possibility: endpoint closure
+is defined exclusively by equality of independently supplied endpoints.
+The second possibility remains an explicit proof obligation for every
+concrete geometry.
+
+Accordingly, the present formalization establishes absence of
+\emph{definitional circularity} in the closure interface. It does not
+declare an arbitrary concrete geometric bridge non-circular without
+separately proving and auditing that bridge.
+
+\[
+\boxed{
+\text{reference to the object under investigation}
+\neq
+\text{assumption of the desired conclusion}
+}
+\]
+
+The use of \(\pi\) as the object under investigation is therefore
+formally distinguished from the use of the desired conclusion as a
+premise. The former is necessary reference; the latter would be
+circularity.
+
+\subsection*{Ad-Hoc Construction Audit}
+
+The earlier spatial-seam construction assigns the next exact finite
+Gregory--Leibniz correction to a finite coordinate displacement.
+Within that explicitly declared model, endpoint inequality is
+kernel-checked. However, that construction is not claimed to derive
+the displacement from classical Euclidean geometry.
+
+It is therefore classified as an operational model rather than as an
+independent Euclidean bridge.
+
+This distinction prevents the arithmetic correction from being
+silently renamed as a geometric gap.
+
+\subsection*{Audit Classification}
+
+\begin{center}
+\small
+\begin{tabular}{p{0.34\linewidth} p{0.18\linewidth} p{0.37\linewidth}}
+\toprule
+\textbf{Statement} &
+\textbf{Status} &
+\textbf{Classification} \\
+\midrule
+
+Finite successor exhaustion &
+Kernel-checked &
+Unconditional finite core \\[3pt]
+
+Finite Gregory--Leibniz terminality &
+Kernel-checked impossible &
+Unconditional finite arithmetic \\[3pt]
+
+Completed totality has finite origin &
+Kernel-checked false &
+Explicit completion/attainment separation \\[3pt]
+
+Finite representation creates completion &
+Kernel-checked false &
+Representation invariance barrier \\[3pt]
+
+Endpoint closure means finish \(=\) start &
+Kernel-checked definition &
+Independent of terminality \\[3pt]
+
+Endpoint closure implies \(\pi\)-terminality &
+Separate bridge required &
+Concrete geometric proof obligation \\[3pt]
+
+Spatial seam non-closure &
+Kernel-checked in its model &
+Operational model, not Euclidean derivation \\[3pt]
+
+Legacy containment model &
+Kernel-checked in its model &
+Operational containment model, not fluid mechanics \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The purpose of formal verification is not to make criticism impossible.
+It is to make the exact target of criticism visible.
+
+
+
+\section{V1.5 Reviewer-Adversarial Closure:
+Limit, Attainment, and Classical Euclidean Traversal}
+\label{sec:v15-adversarial-closure}
+
+The V1.5 formal development adds an adversarial layer specifically to
+prevent three possible misreadings of the earlier argument:
+
+\begin{enumerate}
+\item that it attacks only a fixed numerical tolerance rather than the
+      quantified classical definition of a limit;
+\item that it infers failure of classical convergence from failure of
+      finite attainment; or
+\item that its geometric endpoints are merely arithmetic states
+      renamed as spatial coordinates.
+\end{enumerate}
+
+All three interpretations are rejected by explicit formal
+constructions.
+
+\subsection{Two formally separated semantic layers}
+
+The original ultradeterminist core remains unchanged.  It uses no
+Mathlib and does not import a completed real-number model merely to
+obtain the object whose constructive status is under examination.
+
+A second, deliberately external adversarial layer does the opposite:
+it works in Mathlib and explicitly grants standard real numbers,
+\texttt{Real.pi}, classical trigonometry, the classical irrationality
+of $\pi$, and the classical Gregory--Leibniz limit theorem.
+
+The classical layer therefore carries the axiomatic dependencies of
+that library environment, including
+\texttt{propext}, \texttt{Classical.choice}, and
+\texttt{Quot.sound}.  Those dependencies are expected in this
+cross-check and are not dependencies of the ultradeterminist core.
+No local \texttt{sorry}, \texttt{admit}, \texttt{axiom}, or
+\texttt{sorryAx} is introduced in the adversarial modules.
+
+\subsection{Classical $\pi$ and its limit are granted}
+
+Let
+\[
+P_n
+=
+4\sum_{i=0}^{n-1}\frac{(-1)^i}{2i+1}.
+\]
+Throughout the classical adversarial discussion, mathematical
+stage notation follows the paper convention: \(P_n\) denotes the
+nonempty partial sum through index \(n\).  The Lean implementation
+uses \texttt{Finset.range k}, so its corresponding nonempty stage is
+\texttt{gregoryPartialQ (n+1)}.  Consequently, implementation-level
+pairs indexed by \(n+2,n+1\) are displayed here as the equivalent
+paper-level pair \(n+1,n\).  This is an indexing translation only; no
+formal theorem or arithmetic identity is changed.
+
+In the classical adversarial layer, each finite $P_n$ is represented
+as a rational number embedded in $\mathbb R$.
+
+The classical theorem
+\[
+P_n\longrightarrow\pi
+\]
+is granted rather than denied.  The classical irrationality of
+$\pi$ is also granted.  Since every finite $P_n$ is rational,
+\[
+\boxed{P_n\neq\pi}
+\]
+for every finite $n$.
+
+For every nonzero real radius $r$, define
+\[
+C_n=2rP_n,
+\qquad
+C_{\mathrm{classical}}=2r\pi.
+\]
+Then
+\[
+\boxed{C_n\neq2r\pi}
+\]
+at every finite Gregory stage.
+
+This is not a denial of
+\[
+\lim_{n\to\infty}C_n=2r\pi.
+\]
+It is a theorem about finite-stage equality.
+
+\subsection{The Gregory correction is connected to the actual stage recursion}
+
+The classical bridge does not introduce an unrelated quantity and call
+it a ``correction.''  With the indexing above, define
+\[
+\Delta\pi_n
+=
+\frac{(-1)^{n+1}4}{2n+3}.
+\]
+The kernel-checked rational recurrence is
+\[
+\boxed{
+P_{n+1}
+=
+P_n
++
+\Delta\pi_n.
+}
+\]
+The rational correction is then cast exactly into the real correction,
+yielding the corresponding real recurrence.
+
+Consequently,
+\[
+\Delta C_n
+=
+2r\Delta\pi_n
+\]
+and
+\[
+\boxed{
+C_{n+1}
+=
+C_n
++
+\Delta C_n.
+}
+\]
+
+Thus the geometric correction used below is formally the actual
+difference between consecutive Gregory-generated circumference stages;
+it is not introduced independently of the sequence.
+
+\subsection{A genuine Euclidean traversal map}
+
+For $r\neq0$, define the standard real trigonometric traversal by
+length
+\[
+G_r(s)
+=
+\left(
+r\cos\frac{s}{r},
+r\sin\frac{s}{r}
+\right).
+\]
+The adversarial Mathlib layer verifies
+\[
+\boxed{
+G_r(s)_x^2+G_r(s)_y^2=r^2
+}
+\]
+for every real $s$.  Hence the endpoints in this layer are literal
+pairs of real coordinates on the ordinary Euclidean circle; they are
+not arithmetic numerators renamed ``start'' and ``finish.''
+
+The Gregory circumference correction satisfies
+\[
+\frac{\Delta C_n}{r}
+=
+2\Delta\pi_n,
+\]
+and the formal development proves
+\[
+0<
+\left|2\Delta\pi_n\right|
+<
+2\pi.
+\]
+Therefore the angular correction is neither zero nor a complete
+$2\pi$ period.  For every real base length $s$,
+\[
+\boxed{
+G_r(s+\Delta C_n)\neq G_r(s).
+}
+\]
+
+Combining this theorem with the exact stage recurrence gives
+\[
+\boxed{
+G_r(C_{n+1})
+\neq
+G_r(C_n)
+}
+\]
+for every finite $n$ and every $r\neq0$.
+
+Equivalently, there is no finite witness to consecutive Euclidean
+endpoint stabilization in the Gregory-generated traversal sequence.
+
+\subsection{What this geometric theorem does not say}
+
+The result above is stronger than the former operational
+finite-progress geometry because the points are now actual
+$\mathbb R^2$ points satisfying the standard circle equation and the
+traversal uses classical sine and cosine.
+
+It still does \emph{not} assert
+\[
+G_r(2\pi r)\neq G_r(0).
+\]
+In the completed classical theory,
+\[
+G_r(2\pi r)=G_r(0),
+\]
+and the V1.5 adversarial layer does not deny this.
+
+The proved statement is instead:
+\begin{center}
+\textbf{The finite Gregory-generated Euclidean traversal endpoints do
+not stabilize at any consecutive finite refinement.}
+\end{center}
+
+Thus ``classical circle closure'' and ``finite Gregory-stage
+stabilization'' are kept as different propositions.
+
+\subsection{Frozen reviewer-adversarial checkpoint}
+% V1.5_ADVERSARIAL_CHECKPOINT=PI_QUASI_V1_5_REVIEWER_ADVERSARIAL_CLOSURE_FROZEN_20260821T215101-0300
+
+
+The formal additions described in this section are frozen as
+\[
+\texttt{
+PI\_QUASI\_V1\_5\_REVIEWER\_ADVERSARIAL\_CLOSURE\_FROZEN\_
+20260821T215101-0300}.
+\]
+Its manifest SHA-256 is
+\[
+\texttt{
+4792162d3b0873787b125bedd9dad43bf71611138b32596257fe122d05002313
+}
+\]
+and its archive SHA-256 is
+\[
+\texttt{
+f682f0638e56decc6e4130ccccce99dab822e8f1d5c8d6ea0f505225e6f555fc
+}.
+\]
+
+
+\section{Adversarial Questions and Prepared Responses}
+
+The questions in this section are not rhetorical. Several identify
+genuine boundaries of the formal result. The purpose is to distinguish
+a refutation of a theorem actually proved from an objection to a
+stronger interpretation that the theorem itself does not claim.
+
+\paragraph{Q1. Is the argument circular because it uses \(\pi\) to reason about \(\pi\)?}
+
+\textbf{Response.}
+No. Referring to the mathematical object under investigation is
+necessary, not circular. Circularity would arise if the desired
+conclusion were encoded into the premise or definition from which it
+is later derived. In the audited formulation, endpoint closure is
+defined independently as
+\[
+\operatorname{finish}_{G}(s)=\operatorname{start}_{G}(s),
+\]
+with no occurrence of \texttt{TraditionalPiTerminal}. Any implication
+from endpoint closure to arithmetic terminality is isolated as a
+separate bridge obligation.
+
+\paragraph{Q2. Did the formalization simply define closure so that finite \(\pi\) stages cannot close?}
+
+\textbf{Response.}
+Not in the audited publication interface. The earlier operational
+closure model related closure directly to terminality and is now
+explicitly classified as an operational model. The publication-level
+closure interface uses endpoint equality only. Definitional
+circularity is therefore absent from the audited closure interface.
+
+\paragraph{Q3. Has the work proved unconditionally that a traditional Euclidean circle does not close?}
+
+No.  The completed classical Euclidean circle is not claimed to be
+non-closed.  V1.5 instead proves a narrower and now genuinely
+Euclidean statement.
+
+In the external classical layer, the finite Gregory circumference
+stages are mapped by
+\[
+G_r(s)
+=
+\left(
+r\cos(s/r),
+r\sin(s/r)
+\right),
+\]
+whose images satisfy
+\[
+x^2+y^2=r^2.
+\]
+The exact Gregory stage recurrence and circumference recurrence are
+kernel-checked, and for every nonzero radius and every finite $n$,
+\[
+G_r(C_{n+1})
+\neq
+G_r(C_n).
+\]
+
+Thus the earlier objection that the endpoints were merely arithmetic
+states renamed as geometry no longer applies to this V1.5 classical
+cross-check.  What remains unclaimed is the different proposition
+that the completed classical circle itself fails to close at
+$2\pi r$.
+
+\paragraph{Q4. Is the spatial seam merely the Gregory correction renamed as a geometric gap?}
+
+\textbf{Response.}
+In the earlier spatial-seam model, the next exact finite
+Gregory--Leibniz correction is explicitly embedded as a coordinate
+displacement. The theorem about that declared model is kernel-checked,
+but the displacement is not claimed to have been independently derived
+from classical Euclidean geometry. The seam construction is therefore
+classified as an operational model, not as an independent Euclidean
+proof.
+
+\paragraph{Q5. Does the proof concern Gregory--Leibniz partial sums rather than the classical completed real number \(\pi\)?}
+
+\textbf{Response.}
+The finite arithmetic theorem concerns the finite Gregory--Leibniz
+process conventionally associated with \(\pi\). The work deliberately
+does not identify any finite stage with the completed real number
+\(\pi\). The distinction between a finite generating process and its
+completed mathematical object is precisely one of the subjects under
+investigation.
+
+\paragraph{Q6. But the infinite Gregory--Leibniz series converges to \(\pi\). Does that not settle the issue?}
+
+\textbf{Response.}
+It settles the classical limit identification inside a framework in
+which that completion is admitted. It does not produce a final finite
+stage of the generating process. The paper distinguishes
+\[
+\text{convergence and completion}
+\quad\text{from}\quad
+\text{finite attainment}.
+\]
+
+\paragraph{Q7. A limit is exact. Why treat completion as problematic?}
+
+\textbf{Response.}
+The paper does not claim that limits are mathematically illegitimate or
+inexact. It makes the narrower statement that a completed limit object
+is not thereby the final finite stage of the process generating it.
+The distinction concerns attainment and foundational interpretation,
+not an alleged inconsistency of classical limit theory.
+
+\paragraph{Q8. Is this merely finitism imposed by definition?}
+
+\textbf{Response.}
+The regime deliberately studies finite constructions and finite
+witnesses. That methodological restriction is explicit rather than
+hidden. The resulting theorems establish what follows inside that
+regime. They do not claim that classical mathematics is compelled to
+adopt the same foundational commitments.
+
+\paragraph{Q9. Why use the term ``ultrafinitary''?}
+
+\textbf{Response.}
+The term is used operationally for the finite-construction regime
+adopted in this work. No claim is made that this regime coincides with
+every historical or contemporary doctrine described as
+ultrafinitism.
+
+\paragraph{Q10. Does Lean prove that the philosophical interpretation is true?}
+
+\textbf{Response.}
+No. Lean verifies that the formal conclusions follow from the declared
+formal definitions and constructions. Philosophical and foundational
+interpretations are explicitly separated from kernel-checked theorem
+statements.
+
+
+\paragraph{Q11. Could Lean itself be unsound?}
+
+\textbf{Response.}
+This work does not claim a proof of the metatheoretic consistency of
+Lean. It reports that the stated theorems are accepted by the specified
+Lean kernel and that the audited ultradeterminist-core results do not depend on
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}, or
+\texttt{sorryAx}.  The separate V1.5 classical adversarial layer
+intentionally uses Mathlib and therefore carries its standard
+classical dependencies. Proof authority is therefore kernel-relative,
+explicit, and reproducibly auditable.
+
+\paragraph{Q12. Is a successful Lean return code all that was checked?}
+
+\textbf{Response.}
+No. The final chain includes kernel compilation, explicit
+\texttt{\#print axioms} inspection, forbidden-declaration audits,
+exact arithmetic modules, compiled artifacts, and cryptographic hashes
+of the promoted formal sources. Execution success alone is not treated
+as proof.
+
+\paragraph{Q13. Is the finite-representation result trivial because re-encoding preserves the same source?}
+
+\textbf{Response.}
+It is an invariance theorem and is presented as such. Its claim is not
+that representation theory has been exhausted, but that changing a
+finite encoding alone cannot transform the underlying finite source
+into an externally added comparison-completion object.
+
+\paragraph{Q14. Does arbitrary precision eventually produce exact \(\pi\)?}
+
+\textbf{Response.}
+Increasing finite precision may reduce numerical error dramatically and
+may satisfy arbitrarily demanding practical tolerances. The formal
+claim is different: every still-finite representation remains finite
+and does not thereby become the actual completion object.
+
+\paragraph{Q15. Is floating-point arithmetic being declared mathematically invalid?}
+
+\textbf{Response.}
+No. Floating-point arithmetic is useful and often highly accurate. The
+paper rejects only the substitution
+\[
+|\delta|<\varepsilon
+\quad\Longrightarrow\quad
+\delta=0
+\]
+when exact equality is the proposition under examination. Approximation
+quality and exact identity are different predicates.
+
+\paragraph{Q16. Does the legacy containment model prove a physical theorem?}
+
+\textbf{Response.}
+
+No.  It is an operational certification model only.  A physical result
+would require independently specified material laws, geometry,
+pressure, scale, transport mechanisms, constitutive assumptions, and
+the relevant physical boundary conditions.
+
+No such theorem is inferred from the legacy containment model, and no
+physical premise is used in the V1.5 arithmetic, limit-attainment, or
+classical Euclidean traversal results.
+
+\paragraph{Q17. Is the paper attacking Cantor, Hilbert, and ZFC?}
+
+\textbf{Response.}
+Yes. Explicitly.
+
+The target is the foundational promotion from indefinitely extendable
+finite construction to actually completed infinite totality.
+
+The kernel-checked finite results establish, within the declared
+regime, that no finite successor-generated totality exhausts the
+process, every finite Gregory--Leibniz stage under study remains
+nonterminal, the externally added comparison-completion has no finite origin, and
+finite representation does not manufacture that completion.
+
+The paper therefore directly challenges the legitimacy of treating
+actual completion as though it were merely the eventual completion of
+the finite process that motivates it.
+
+The criticism applies to Cantorian actual infinity, to the use of
+Hilbertian ideal objects where non-finitely-attained completion is
+granted mathematical standing, and to set-theoretic foundations such
+as ZFC that admit completed infinite totalities.
+
+What is not claimed is equally important: the present Lean development
+does not derive \texttt{False} from the axioms of ZFC and therefore does
+not constitute a formal inconsistency proof of ZFC.
+
+The attack is foundational and ontological:
+
+\[
+\boxed{
+\text{axiomatic availability of completion}
+\neq
+\text{finite attainment of completion}
+}
+\]
+
+\paragraph{Q18. Does the V1.5 result still depend on an unproved Euclidean bridge?}
+
+\textbf{Response.}
+
+Not for the finite-stage Euclidean non-stabilization theorem now
+claimed.
+
+V1.5 explicitly constructs the map
+\[
+G_r(s)
+=
+\left(
+r\cos(s/r),
+r\sin(s/r)
+\right),
+\]
+proves that its points satisfy
+\[
+x^2+y^2=r^2,
+\]
+connects the Gregory correction to the exact difference between
+consecutive Gregory stages and circumference stages, and proves
+\[
+G_r(C_{n+1})
+\neq
+G_r(C_n)
+\]
+for every finite \(n\) and every nonzero \(r\).
+
+What remains outside the theorem is a different statement: V1.5 does
+not claim that the completed classical circle fails to close.  The
+standard identity
+\[
+G_r(2\pi r)=G_r(0)
+\]
+is explicitly granted.
+
+\paragraph{Q19. Why not simply assume that the classical Euclidean circle is closed?}
+
+V1.5 does exactly that in its classical adversarial layer.  Standard
+real numbers, classical $\pi$, classical trigonometry, and ordinary
+Euclidean circle closure are granted for the purpose of the
+cross-check.
+
+Granting
+\[
+G_r(2\pi r)=G_r(0)
+\]
+does not imply that some finite Gregory stage equals $2\pi r$, nor
+that the sequence of finite Gregory-generated endpoints stabilizes.
+The kernel-checked result is
+\[
+G_r(C_{n+1})\neq G_r(C_n)
+\]
+for every finite $n$ and every $r\neq0$.
+
+The dispute is therefore not over whether classical Euclidean
+semantics proves its own completed circle closed.  It does.  The
+foundational question concerns the relation between that completed
+object and the finite generating process.
+
+\paragraph{Q20. What result would most directly weaken or challenge the present position?}
+
+\textbf{Response.}
+A particularly strong counter-result would provide an independently
+formalized finite endpoint geometry whose definition of closure does
+not contain arithmetic terminality, together with an exact finite
+construction proving endpoint equality while preserving the finite
+arithmetic assumptions used here. Such a result would directly address
+the explicit bridge frontier rather than a stronger claim the present
+paper does not make.
+
+\medskip
+
+A criticism is strongest when it targets a proposition actually
+asserted. The audited formalization is designed to make those
+propositions, their assumptions, and the remaining bridge obligations
+explicit.
+
+
+
+
+
+\paragraph{Q21. Does a Bishop-style or Cauchy construction defeat the finite-attainment result?}
+
+\textbf{Response.}
+
+No.  Such a construction may provide an exact full-tail convergence
+modulus and may support exact equality in a resulting completed-real
+semantics.  V1.5.1 grants precisely this type of full-tail modulus for
+the Gregory correction itself.
+
+Nevertheless, the same kernel-checked development proves that every
+finitely constructed Gregory correction remains exactly nonzero.  It
+also proves that no universal finite exact-zero witness can be
+extracted from the full-tail zero certificate.
+
+Hence
+\[
+\boxed{
+\text{constructive completion}
+\not\Rightarrow
+\text{finite operational attainment}.
+}
+\]
+
+This is not an objection to Bishop-style analysis or Cauchy completion.
+It is a separation between the equality predicate of a completed
+semantics and the existence of a finite stage realizing exact zero.
+
+
+
+\paragraph{Q22. Was this not solved decades ago by completion theory,
+constructive analysis and modern real-number foundations?}
+
+\textbf{Response.}
+
+Yes, if ``solved'' means that mathematics possesses rigorous classical
+and constructive frameworks in which convergent processes define exact
+completed real objects. This paper explicitly grants that result.
+
+No, if the proposition under examination is finite exact attainment by
+a member of the generating process.
+
+The distinction between convergence and attainment is itself old and
+is not claimed here as a discovery. What the present development adds
+is a concrete kernel-audited case in which the same Gregory--Leibniz
+family simultaneously satisfies an explicit arbitrarily fine
+full-tail convergence criterion and permanent finite non-attainment,
+together with a formal refutation of a universal finite
+witness-extraction bridge.
+
+Thus this paper does not reopen a problem that completion failed to
+solve. It separates the problem that completion solves from a
+different predicate that completion does not assert:
+
+\[
+\boxed{
+\text{completed semantic equality}
+\not\Rightarrow
+\text{finite-stage attainment}.
+}
+\]
+
+
+\paragraph{Q23. Is the contribution merely that elementary mathematics
+was rewritten in Lean?}
+
+\textbf{Response.}
+
+No. The arithmetic fact that each Gregory correction is nonzero is
+elementary, and this paper says so explicitly.
+
+Lean is used as an audit instrument to prevent semantic substitution
+between distinct predicates. The mathematical question survives if
+Lean is removed from the discussion:
+
+\[
+\boxed{
+\text{Does completed exact equality imply finite exact attainment?}
+}
+\]
+
+For the constructions studied here, the answer is no.
+
+Rechecking the same results in Coq, Isabelle, CVC5, Z3 or another
+system may strengthen independent audit, but duplication across proof
+assistants is not the scientific thesis of this essay.
+
+The thesis concerns the mathematical distinction and the foundational
+choice represented by completion.
+
+\section{Classical Euclidean Control Result and Remaining Boundary}
+\label{sec:classical-euclidean-control}
+
+The V1.5 classical adversarial layer no longer asks an external critic
+to supply a Euclidean bridge.  It constructs one directly within the
+standard real-number and trigonometric semantics of Mathlib.
+
+For nonzero real radius \(r\), define
+\[
+G_r(s)
+=
+\left(
+r\cos(s/r),
+r\sin(s/r)
+\right).
+\]
+The kernel verifies
+\[
+G_r(s)_x^2+G_r(s)_y^2=r^2.
+\]
+
+For the finite Gregory stages,
+\[
+P_{n+1}
+=
+P_n
++
+\Delta\pi_n,
+\]
+and therefore
+\[
+C_{n+1}
+=
+C_n
++
+\Delta C_n.
+\]
+
+The same development proves
+\[
+0<
+\left|
+\frac{\Delta C_n}{r}
+\right|
+<
+2\pi.
+\]
+Hence the correction is neither zero angular displacement nor a full
+period, and consequently
+\[
+\boxed{
+G_r(C_{n+1})
+\neq
+G_r(C_n)
+}
+\]
+for every finite \(n\) and every \(r\neq0\).
+
+This is an ordinary Euclidean statement about real coordinate pairs on
+the circle \(x^2+y^2=r^2\).  It is not based on naming arithmetic
+numerators ``start'' and ``finish.''
+
+At the same time, V1.5 explicitly grants the completed classical
+identity
+\[
+G_r(2\pi r)=G_r(0).
+\]
+The paper therefore distinguishes
+
+\[
+\text{closure of the completed classical circle}
+\]
+
+from
+
+\[
+\text{exact stabilization of the finite Gregory-generated endpoints}.
+\]
+
+Only the latter is proved impossible at every consecutive finite
+Gregory refinement.
+
+
+\section{Interim Synthesis}
+
+The foundational position of this paper is intentionally non-neutral.
+
+Classical mathematics is free to introduce actually completed
+infinite objects through its chosen semantics and axioms. The present
+work denies that such admission, by itself, converts a nonterminal
+finite process into a finitely attained completed object.
+
+The distinction formalized here is therefore not merely computational:
+
+\[
+\boxed{
+\text{construction}
+\neq
+\text{completion}
+}
+\]
+
+\[
+\boxed{
+\text{axiomatic existence}
+\neq
+\text{finite provenance}
+}
+\]
+
+\[
+\boxed{
+\text{arbitrarily accurate approximation}
+\neq
+\text{exact attainment}
+}
+\]
+
+The paper therefore treats the distinction between potential
+construction and actual completion as an explicit comparison
+criterion. Classical foundations may justify completed objects by
+their own semantics; the finite-core results address the separate
+question of whether such completion is attained by a finite stage.
+
+Relative to the finite-stage generating process, the comparison is:
+
+\[
+\boxed{
+\text{completion is an additional semantic commitment}
+}
+\]
+
+A completion may be mathematically legitimate, computationally useful,
+and deductively powerful. What it is not, without an additional
+witness, is the final finite stage of the process that motivates it.
+
+\begin{center}
+\textbf{Completion is an extension, not an event.}
+\end{center}
+
+
+
+The formal development isolates a simple distinction with substantial
+foundational consequences.
+
+For every admissible finite stage of the chosen $\pi$ process:
+\[
+\neg\Terminal_\pi.
+\]
+
+For every finite refinement count:
+\[
+\neg\Closed(\pi_k).
+\]
+
+For every finite encoding and precision represented by the
+construction, the resulting finite object is not identified with the
+external comparison-completion object:
+\[
+x_{\mathrm{finite}}
+\neq
+\ExternalCompletion.
+\]
+
+For every finite candidate totality:
+\[
+\neg\FiniteExhaustion.
+\]
+
+Yet an explicitly enlarged universe may contain an object declared to
+carry completed-totality or closure properties.
+
+Thus:
+\[
+\boxed{
+\textbf{actual completion is not finite attainment.}
+}
+\]
+
+In this precise sense, ``closure at infinity'' is not an event occurring
+at the end of the finite process. There is no final finite event.
+It is a property of an additional completion object admitted by a
+stronger ontology.
+
+The $\pi$-circle serves as the operational witness of this separation.
+
+A completion may be mathematically legitimate, computationally useful,
+and physically effective as a model. What it is not, without an
+additional witness, is the final finite stage of the process that
+motivates it.
+
+\begin{center}
+\textbf{Completion is an extension, not an event.}
+\end{center}
+
+
+
+
+\paragraph{Constructive-Cauchy boundary.}
+The constructive-Cauchy objection does not collapse the distinction.
+The same Gregory correction family admits an explicit arbitrarily fine
+full-tail zero modulus while remaining exactly nonzero at every
+finitely constructed stage.  Thus a completion may consistently supply
+an exact semantic equality without supplying a finite operational
+attainment witness:
+\[
+\boxed{
+\text{constructive completion}
+\neq
+\text{finite attainment}.
+}
+\]
+
+
+
+\paragraph{The reopened question.}
+Nothing in this work requires denying traditional \(\pi\), classical
+real analysis, constructive analysis or the completed Euclidean
+circle. Their success does not establish uniqueness of the
+foundational architecture from which exact circular mathematics can
+be built.
+
+Traditional \(\pi\) works. The open question is whether an exact,
+finite and deterministic circular architecture can preserve the
+relevant structural roles of \(\pi\) while obtaining closure without
+requiring an actually completed infinite object.
+
+The present work does not claim that such an architecture has been
+constructed here. It claims that the formally separated distinction
+between completed closure and finite attainment provides a
+mathematically precise reason to ask for one.
+
+\section*{Artifact Hierarchy}
+
+The artifacts accompanying this work have distinct epistemic roles:
+
+\begin{itemize}
+
+\item \textbf{Lean source (\texttt{.lean})}: formal source of the
+mathematical claims.
+
+\item \textbf{Lean compiled module (\texttt{.olean})}: compiled artifact
+accepted by the specified Lean toolchain.
+
+\item \textbf{Axiom audit}: records the logical dependencies observed
+for the exported final theorems.
+
+\item \textbf{Python reference implementation}: executable finite model
+used for reproduction and inspection; it is not the proof authority.
+
+\item \textbf{Scientific paper}: exposition, interpretation, limitations,
+and foundational argument.
+
+\item \textbf{Frozen checkpoint and SHA256 manifests}: immutable
+provenance records binding the published claims to exact artifacts.
+
+\end{itemize}
+
+Accordingly:
+\[
+\boxed{
+\text{proof authority}
+=
+\text{kernel-checked formal artifact},
+}
+\]
+not the Python program, the prose exposition, or an AI-generated
+explanation.
+
+
+
+
+\section{Potentially Unbounded Finite Delay in the Operational Model}
+
+The operational leakage model admits a further finite result.
+
+An open boundary need not imply an immediately observable escape.
+Depending on the adopted transport interpretation, the delay preceding
+escape may be extremely large.
+
+The relevant distinction, however, is not between a small delay and an
+``infinite'' delay. No actually completed infinite time object is
+required.
+
+Let finite delays be generated successively. For every finite delay
+\(d\), another finite delay can be constructed beyond it:
+
+\[
+\forall d_{\mathrm{finite}},
+\exists d'_{\mathrm{finite}},
+\qquad
+d'>d.
+\]
+
+Consequently, there is no maximal finite delay:
+
+\[
+\boxed{
+\neg\exists d_{\max}
+\;
+\forall d_{\mathrm{finite}},
+\quad
+d\le d_{\max}.
+}
+\]
+
+This is potential unboundedness rather than actual infinity.
+
+\subsection{Finite Exact Transport Model}
+
+The accompanying Lean development introduces a deliberately minimal
+finite transport state. A contained operational parcel carries a
+finite countdown before modeled escape through an already open
+boundary.
+
+For every chosen finite delay \(d\), the transport process reaches the
+escaped state after a corresponding finite number of exact successor
+steps.
+
+Thus:
+
+\[
+\boxed{
+\text{every chosen finite delay can be exhausted finitely}.
+}
+\]
+
+Combining persistent modeled openness with this finite transport rule
+gives:
+
+\[
+\boxed{
+\text{arbitrarily delayed}
+\neq
+\text{structurally eliminated}.
+}
+\]
+
+More precisely, for every proposed finite delay ceiling \(m\), there
+exists a larger finite delay \(d\) such that the operational escape
+still occurs after finite transport.
+
+The result therefore does not require
+
+\[
+t=\infty,
+\]
+
+an actually completed infinite timeline, or a terminal infinite state.
+
+It requires only successor unboundedness:
+
+\[
+d,\quad
+d+1,\quad
+d+2,\quad\ldots
+\]
+
+understood exclusively as indefinitely extendable finite
+construction.
+
+\subsection{What Potential Infinity Does and Does Not Do}
+
+Potential infinity is not treated as a physical cause of leakage.
+
+The causal structure of the operational model is instead:
+
+\[
+\boxed{
+\text{persistent opening}
++
+\text{finite transport rule}
+\Longrightarrow
+\text{finite escape}.
+}
+\]
+
+Potential unboundedness establishes a different point: no chosen
+finite delay constitutes a final delay beyond which the structural
+opening has somehow disappeared.
+
+Hence increasing the modeled waiting time does not repair the
+underlying non-closure.
+
+\subsection{Physical Interpretation Boundary}
+
+The formal result remains an operational transport theorem.
+
+A literal statement about physical water requires an additional
+physical interpretation connecting the operational boundary and
+transport state to a particular physical system.
+
+Such an interpretation may depend on quantities or phenomena including
+scale, material structure, pressure, viscosity, surface tension,
+wetting, molecular effects, or other physical conditions.
+
+The formal development therefore distinguishes
+
+\[
+\boxed{
+\text{operational escape}
+}
+\]
+
+from
+
+\[
+\boxed{
+\text{literal physical fluid leakage}.
+}
+\]
+
+The latter follows only conditionally when an independently established
+physical bridge supplies that interpretation.
+
+No Navier--Stokes result is asserted in this section.
+
+\subsection{Foundational Consequence}
+
+The finite-delay result supplies another instance of the distinction
+developed throughout this essay.
+
+There is no need to replace an indefinitely extendable finite process
+with an actually completed infinite object in order to state that no
+finite ceiling exists.
+
+The formal content is already captured by
+
+\[
+\forall d_{\mathrm{finite}},
+\exists d'_{\mathrm{finite}}>d.
+\]
+
+Thus:
+
+\[
+\boxed{
+\text{absence of a finite maximum}
+\neq
+\text{existence of an attained infinite value}.
+}
+\]
+
+The leakage model consequently illustrates, in an operational setting,
+the same foundational separation between potential continuation and
+actual completion that motivates the broader analysis of this essay.
+
+
+
+
+\section{A Derived Independent Finite-Progress Bridge}
+
+A previous stage of this work deliberately left the implication
+
+\[
+\operatorname{EndpointClosed}_G(s)
+\Longrightarrow
+\operatorname{TraditionalPiTerminal}(s)
+\]
+
+as an explicit bridge obligation for an arbitrary endpoint geometry
+\(G\).
+
+That separation was necessary to avoid defining geometric closure in
+terms of the conclusion to be proved.
+
+The formal development now closes such a bridge for a specific
+independently defined finite-progress geometry associated directly with
+the finite traditional-\(\pi\) process.
+
+\subsection{Why the former spatial construction was insufficient}
+
+An earlier operational model represented the next Gregory correction
+as a spatial seam displacement.
+
+That construction was useful as an operational model but was not an
+independent geometric derivation, because the arithmetic residual was
+inserted directly into the spatial representation.
+
+The new construction does not use that seam model.
+
+No Gregory residual is inserted as a spatial coordinate.
+
+No terminality predicate occurs in the definition of endpoint closure.
+
+\subsection{Finite-progress endpoints}
+
+Let \(s\) be a finitely attained traditional-\(\pi\) stage and let
+
+\[
+\Delta_s
+=
+\operatorname{gregoryPiTerm}
+\bigl(\operatorname{next}(s.index)\bigr)
+\]
+
+be its next exact Gregory correction.
+
+The exact addition
+
+\[
+s.value+\Delta_s
+\]
+
+is represented at a common positive denominator.
+
+At that common denominator define the start endpoint as the scaled
+signed numerator of the current value and define the finish endpoint as
+the exact signed numerator after adding the next correction.
+
+Thus
+
+\[
+A_s
+=
+\operatorname{Scale}
+\bigl(s.value.num,\Delta_s.den\bigr)
+\]
+
+and
+
+\[
+B_s
+=
+A_s+
+\operatorname{Scale}
+\bigl(\Delta_s.num,s.value.den\bigr).
+\]
+
+The endpoint-closure predicate is simply
+
+\[
+\operatorname{EndpointClosed}_{\mathrm{progress}}(s)
+\iff
+B_s=A_s.
+\]
+
+This definition contains no reference to
+\(\operatorname{TraditionalPiTerminal}\).
+
+\subsection{Finite cancellation}
+
+The accompanying Lean development proves directly, using only the
+private Peano-style finite arithmetic of the project, that
+
+\[
+uAdd(a,b)=a
+\Longrightarrow
+b=0.
+\]
+
+It also proves that multiplication by a strictly positive finite value
+cannot turn a nonzero unsigned finite value into zero.
+
+Consequently,
+
+\[
+B_s=A_s
+\]
+
+forces the scaled numerator of the next correction to be zero, and
+positive-scale zero reflection then forces the original numerator of
+the correction itself to be zero.
+
+Hence:
+
+\[
+\boxed{
+\operatorname{EndpointClosed}_{\mathrm{progress}}(s)
+\Longrightarrow
+\operatorname{TraditionalPiTerminal}(s).
+}
+\]
+
+Unlike the earlier generic interface, this bridge is not postulated for
+this finite-progress geometry. It is derived from exact finite
+arithmetic.
+
+\subsection{Non-stabilization of every finite progress stage}
+
+The traditional-\(\pi\) development has already established
+
+\[
+\forall s_{\mathrm{finite}},
+\qquad
+\neg
+\operatorname{TraditionalPiTerminal}(s).
+\]
+
+Combining that theorem with the derived bridge yields
+
+\[
+\boxed{
+\forall s_{\mathrm{finite}},
+\qquad
+\neg
+\operatorname{EndpointClosed}_{\mathrm{progress}}(s).
+}
+\]
+
+Equivalently, there is no finite closure witness for this progress
+geometry.
+
+The result may also be read algebraically.
+
+If
+
+\[
+P_{n+1}=P_n+\Delta_{n+1},
+\]
+
+then semantic stagnation
+
+\[
+P_{n+1}=P_n
+\]
+
+would force
+
+\[
+\Delta_{n+1}=0.
+\]
+
+But every finite Gregory correction in the process is nonzero.
+
+Therefore no finitely attained stage is a stagnation point of the
+finite process.
+
+\subsection{What this result does and does not establish}
+
+This closes an important former proof obligation.
+
+The result is stronger than the earlier spatial-seam model because:
+
+\begin{itemize}
+\item the old spatial seam is not used;
+\item the Gregory residual is not embedded as a spatial coordinate;
+\item endpoint closure is independently defined;
+\item structural equality of fraction representations is not used;
+\item quotient rational equality is not used;
+\item finite Peano cancellation is formally proved;
+\item positive finite scaling is formally proved to reflect zero;
+\item the endpoint-to-terminal bridge is derived rather than assumed.
+\end{itemize}
+
+The classification nevertheless remains precise.
+
+\[
+\boxed{
+\text{derived independent finite-progress bridge}
+}
+\]
+
+is not yet the same theorem as
+
+\[
+\boxed{
+\text{independently derived Euclidean-circle closure bridge}.
+}
+\]
+
+The points of the finite-progress geometry are exact finite signed
+numerators at a common denominator. They are states of exact arithmetic
+progress, not Euclidean spatial coordinates on a completed classical
+circle.
+
+Accordingly, this result does not assert that classical Euclidean
+geometry is internally inconsistent or that the classically completed
+circle fails to be closed under its own semantics.
+
+What it does establish is sharper and entirely finite:
+
+\begin{center}
+\textbf{The finite traditional-\(\pi\) process has no finitely attained
+semantic stagnation stage, and this fact no longer depends on an assumed
+closure-to-terminal bridge for the finite-progress model.}
+\end{center}
+
+The remaining geometric research obligation is therefore narrower:
+derive, independently, an analogous bridge for genuine geometric
+endpoints without encoding the Gregory residual into the geometry.
+
+
+\section{Exact Closure, External Correction, and Safety-Critical Certification}
+
+The preceding finite-attainment results permit a sharper distinction
+between exact closure and corrected closure.
+
+The issue is not primarily the magnitude of a residual correction.
+If exact closure is the property being certified, the logically relevant
+distinction is between a construction that supplies its own exact
+finite closure witness and one that does not.
+
+The accompanying kernel-checked module
+\texttt{FiniteExactClosureCertification.lean} makes this distinction
+explicit.
+
+\subsection{Native finite exact closure}
+
+Let \(G\) be a finite endpoint geometry whose closure predicate is
+defined independently by endpoint equality:
+
+\[
+\operatorname{EndpointClosed}_G(s)
+\quad\Longleftrightarrow\quad
+\operatorname{finish}_G(s)=\operatorname{start}_G(s).
+\]
+
+A native finite exact-closure certificate is a finitely attained stage
+at which this equality actually holds.
+
+Under an independently established bridge
+
+\[
+\operatorname{EndpointClosed}_G(s)
+\Longrightarrow
+\operatorname{TraditionalPiTerminal}(s),
+\]
+
+the previously proved nonterminality of every finite traditional
+\(\pi\)-stage yields
+
+\[
+\neg
+\operatorname{NativeFiniteExactClosureCertificate}(G).
+\]
+
+Thus, under that bridge, the finite traditional-\(\pi\) process studied
+here does not itself supply a native finite exact-closure certificate.
+
+This statement concerns finite attainment. It does not redefine the
+classical completed circle and does not assert an internal contradiction
+within classical real analysis.
+
+\subsection{Correction is not retroactive closure}
+
+Suppose a certification system distinguishes two possible origins of an
+exact closure certificate:
+
+\begin{enumerate}
+\item native finite endpoint closure supplied by the construction itself;
+\item an explicit correction external to that construction.
+\end{enumerate}
+
+The formal result is then immediate but important. If the native branch
+is impossible under the bridge, every successful certificate in this
+model must use the external-correction branch:
+
+\[
+\operatorname{Certified}(G)
+\Longrightarrow
+\operatorname{ExternalCorrectionUsed}(G).
+\]
+
+The correction may be arbitrarily small. Its magnitude does not alter
+the logical classification.
+
+If
+
+\[
+\delta\neq0,
+\]
+
+then reducing \(|\delta|\) does not establish
+
+\[
+\delta=0.
+\]
+
+Likewise, a successful correction does not retroactively prove that the
+uncorrected construction had already supplied exact closure.
+
+\begin{center}
+\textbf{Successful corrected closure is not proof of native uncorrected closure.}
+\end{center}
+
+This is a certification statement, not an argument against numerical
+tolerance. Engineering tolerances can be legitimate and indispensable.
+But a tolerance certificate and an exact-equality certificate are
+different claims.
+
+
+\subsection{Operational certification analogy}
+
+Exact-equality certification and tolerance-based engineering
+certification are different specifications.  The distinction can
+matter in safety-critical applications, but no physical theorem is
+derived here.
+
+The present work supplies no model of spacecraft structures,
+submarines, pressure fields, material failure, fluids, wetting,
+molecular transport, or any other physical mechanism.  Such examples
+are therefore only analogies for the logical distinction between an
+exact certificate and a tolerance certificate.
+
+No physical conclusion in this essay is used in the proof of the
+finite arithmetic theorem, the external-limit separation theorem, or
+the V1.5 classical Euclidean traversal theorem.
+
+
+\subsection{The foundational question}
+
+The same distinction must then be confronted in the finite traditional
+\(\pi\) process studied in this essay.
+
+The formal chain is:
+
+\[
+\text{finite traditional-}\pi\text{ process}
+\]
+
+\[
+\Downarrow
+\]
+
+\[
+\forall s_{\mathrm{finite}},
+\qquad
+\neg\operatorname{TraditionalPiTerminal}(s)
+\]
+
+\[
+\Downarrow
+\]
+
+\[
+\text{no finite attainment of completion}
+\]
+
+\[
+\Downarrow
+\]
+
+\[
+\text{no native finite exact-closure certificate under the bridge}.
+\]
+
+Classical completion instead introduces a completed object in which the
+relevant exact property is available.
+
+The foundational question is therefore not whether classical mathematics
+is permitted to define such a completed object. It plainly does.
+
+The question is whether
+
+\[
+\text{exactness in the completed object}
+\]
+
+should be identified with
+
+\[
+\text{exactness finitely attained by the generating process}.
+\]
+
+The formal development says they are not the same certification claim.
+
+\begin{center}
+\textbf{Completion can supply an exact completed object without supplying a final finite attainment witness.}
+\end{center}
+
+Consequently, if exact closure matters, ``arbitrarily close'', ``smaller
+than every practical tolerance'', and ``exactly equal'' must remain
+logically distinct.
+
+The issue becomes especially sharp when the completed mathematical object
+is subsequently treated as though its exactness had been inherited from
+the finite construction that approaches it.
+
+\subsection{Kernel-checked certification result}
+
+The formal gate closes the following classification:
+
+\begin{itemize}
+\item native finite exact closure is unavailable under the explicit
+      endpoint-to-terminal bridge;
+\item the bridge remains a separate, auditable obligation;
+\item an exact certificate classified as either native or externally
+      corrected must use the external branch when the native branch is
+      impossible;
+\item safety-critical admissibility requiring such an exact certificate
+      therefore inherits the same classification;
+\item no magnitude of correction, physical material, pressure model, or
+      safety outcome is silently assumed.
+\end{itemize}
+
+The result is axiom-free under the project's hard-pass audit and uses no
+floating-point arithmetic.
+
+The central certification separation is therefore:
+
+\[
+\operatorname{CorrectedExactClosure}
+\not\Rightarrow
+\operatorname{NativeFiniteExactClosure}.
+\]
+
+More strongly, in the formal certification model and under the explicit
+bridge,
+
+\[
+\operatorname{Certified}
+\Longrightarrow
+\operatorname{ExternalCorrectionUsed}.
+\]
+
+This supplies a final operational expression of the essay's foundational
+distinction:
+
+\begin{center}
+\textbf{Finite attainment and actual completion must not be conflated merely because the completed object is exact.}
+\end{center}
+
+
+
+
+\section{Finite Gregory Circumference Non-Stabilization}
+
+Let
+
+\[
+P_n
+=
+4\sum_{j=0}^{n}
+\frac{(-1)^j}{2j+1}
+\]
+
+be a finitely constructed Gregory--Leibniz stage.
+
+\paragraph{Indexing convention.}
+The mathematical notation in this paper is zero-based by
+\emph{nonempty} Gregory stage:
+\[
+P_n
+=
+4\sum_{j=0}^{n}
+\frac{(-1)^j}{2j+1},
+\]
+so \(P_0=4\) already contains one summand.  The Lean classical bridge
+uses the implementation-level definition
+\texttt{gregoryPartialQ k} with \texttt{Finset.range k}, which contains
+exactly \(k\) summands.  Consequently,
+\[
+\boxed{
+P_n^{\mathrm{paper}}
+=
+\texttt{gregoryPartialQ}(n+1)
+}
+\]
+after coercion into the relevant numeric domain.  The same one-step
+translation applies to the circumference stages.  Thus an
+implementation-level statement involving consecutive nonempty stages
+\(k+1\) and \(k\) is displayed in the paper as the mathematically
+equivalent pair \(n+1\) and \(n\).  Unless a Lean identifier is quoted literally, mathematical
+stage displays throughout this paper use the paper convention;
+implementation-level code and theorem identifiers retain their native
+Lean indices.
+
+Its next exact correction is
+
+\[
+\Delta\pi_n
+=
+\frac{(-1)^{n+1}4}{2n+3}.
+\]
+
+For every constructed finite \(n\),
+
+\[
+\boxed{\Delta\pi_n\neq0.}
+\]
+
+Let
+
+\[
+r=\frac{a}{b},
+\qquad a>0,\quad b>0,
+\]
+
+and define the constructed circumference stage
+
+\[
+C_n=2rP_n.
+\]
+
+Then
+
+\[
+C_{n+1}
+=
+C_n+\Delta C_n
+\]
+
+with
+
+\[
+\Delta C_n
+=
+2r\Delta\pi_n.
+\]
+
+Therefore
+
+\[
+\boxed{
+\Delta C_n
+=
+\frac{(-1)^{n+1}8a}
+{b(2n+3)}.
+}
+\]
+
+Because every factor in the unsigned magnitude is strictly positive,
+
+\[
+\boxed{
+\Delta C_n\neq0
+}
+\]
+
+at every constructed stage.
+
+We call \(\Delta C_n\) the exact
+\emph{circumference closure debt} of stage \(n\).
+
+Here \emph{closure debt} means only exact algebraic stabilization
+debt: the signed finite correction that would have to vanish for the
+corresponding consecutive circumference stages to become exactly
+equal. It is not a physical deficit, a geometric gap length, or a
+measured leakage quantity.
+
+Accordingly, the word \emph{closure} has a deliberately restricted
+algebraic meaning in this section: exact stabilization of the
+circumference construction, namely the disappearance of the next
+induced correction.
+
+Thus the certified condition in this section is
+
+\[
+C_{n+1}=C_n
+\quad\Longleftrightarrow\quad
+\Delta C_n=0.
+\]
+
+This finite-stage result must not be confused with non-closure of the
+completed classical Euclidean curve.  V1.5 now supplies a separate
+classical bridge for the finite Gregory-generated traversal: actual
+real coordinate pairs are used, the standard circle equation is
+verified, and consecutive finite Gregory endpoints are proved
+distinct.  The different completed identity
+\(G_r(2\pi r)=G_r(0)\) remains granted and is not challenged.
+
+The central theorem below does not assume that bridge.
+
+\subsection{No constructed exact closure}
+
+Exact stabilization requires
+
+\[
+\Delta C_n=0.
+\]
+
+The Lean development proves the opposite at every constructed stage:
+
+\[
+\boxed{
+\forall n_{\mathrm{constructed}},
+\quad
+\Delta C_n\neq0.
+}
+\]
+
+Hence
+
+\[
+\boxed{
+\neg\exists n_{\mathrm{constructed}}
+\quad
+\Delta C_n=0.
+}
+\]
+
+There is no finite exact stabilization witness for this traditional-\(\pi\) circumference construction.
+
+Moreover, after every finitely represented number \(k\) of additional
+refinements,
+
+\[
+\boxed{
+\Delta C_{n+k}\neq0.
+}
+\]
+
+Thus eventual finite exact stabilization of this circumference construction is also impossible.
+
+\subsection{Normalized exact closure}
+
+For certification purposes, normalize the exact algebraic stabilization state as
+
+\[
+Closure_n=1
+\]
+
+only when
+
+\[
+\Delta C_n=0.
+\]
+
+Conversely, a nonzero exact debt cannot legitimately receive the exact
+closure certificate \(1\).
+
+The formal Lean gate therefore proves
+
+\[
+\boxed{
+\Delta C_n\neq0
+\Longrightarrow
+Closure_n\neq1.
+}
+\]
+
+Since \(\Delta C_n\neq0\) for every constructed stage,
+
+\[
+\boxed{
+\forall n_{\mathrm{constructed}},
+\quad
+Closure_n\neq1.
+}
+\]
+
+The same remains true after every finite continuation.
+
+This is a logical certification result. The symbol \(1\) does not mean
+that a physical gap has magnitude one. It denotes only the normalized
+state ``exactly closed''.
+
+\subsection{No infinite terminal stage}
+
+The formal construction admits finite stages and finite successor
+steps.
+
+It does not admit a constructor corresponding to an attained stage
+
+\[
+n=\infty.
+\]
+
+Therefore the statement
+
+\[
+n\to\infty
+\]
+
+can express indefinitely extensible continuation, but cannot be used
+inside the regime as the name of a final constructed stage.
+
+The sequence has the form
+
+\[
+C_0
+\xrightarrow{\Delta C_0\neq0}
+C_1
+\xrightarrow{\Delta C_1\neq0}
+C_2
+\xrightarrow{\Delta C_2\neq0}
+\cdots
+\]
+
+where every represented arrow is a finite exact construction step.
+
+No constructed stage satisfies
+
+\[
+C_{n+1}=C_n.
+\]
+
+No constructed stage satisfies
+
+\[
+Closure_n=1.
+\]
+
+Thus:
+
+\[
+\boxed{
+\text{indefinite continuation}
+\neq
+\text{attained completion}.
+}
+\]
+
+And:
+
+\[
+\boxed{
+\text{nonzero but decreasing correction}
+\neq
+\text{zero correction}.
+}
+\]
+
+\subsection{Foundational consequence}
+
+The question addressed by this paper is therefore not whether classical
+analysis possesses a limit operation.
+
+It is:
+
+\begin{quote}
+At which constructed stage does the traditional-\(\pi\) circumference
+first attain exact closure?
+\end{quote}
+
+For the construction formalized here, the kernel-checked answer is:
+
+\begin{center}
+\textbf{At none.}
+\end{center}
+
+No alternative value of \(\pi\) is introduced.
+
+No actually infinite terminal object is introduced.
+
+No numerical tolerance is substituted for exact equality.
+
+The final classification is:
+
+\[
+\boxed{
+\textbf{traditional-\(\pi\) ultradeterminist circumference-construction non-stabilization}.
+}
+\]
+
+In the terminology of the normalized certification gate:
+
+\[
+\boxed{
+\textbf{the construction never produces exact stabilization state \(1\).}
+}
+\]
+
+
+
+
+\section{Cauchy-Style Full-Tail Zero Does Not Imply Finite Attainment}
+\label{sec:cauchy-finite-attainment}
+
+\subsection{The constructive Cauchy objection}
+
+A stronger objection to the finite-attainment distinction begins with
+a mathematically correct observation: the exact Gregory--Leibniz
+corrections themselves provide an explicit modulus of convergence
+toward zero.
+
+Write
+\[
+\Delta\pi_n
+=
+\frac{4(-1)^{n+1}}{2n+3}.
+\]
+One may therefore ask whether a Bishop-style or Cauchy-style
+construction, built directly from this decay, eliminates the
+distinction between completion and finite attainment.
+
+V1.5.1 grants the convergence premise rather than rejecting it.
+
+\subsection{Full-tail Gregory modulus}
+
+The new finite-core Lean module
+\texttt{CauchyEquivalenceDoesNotImplyFiniteAttainment.lean}
+uses a private finite type \texttt{UFin} and an exact signed-fraction
+code.  No host \texttt{Nat}, \texttt{Int}, \texttt{Rat}, or
+\texttt{Float} is used.
+
+For every finitely represented precision index \(k\), the kernel
+constructs a finite boundary \(N\) such that every finite successor
+extension \(N+t\) satisfies
+\[
+\boxed{
+\forall k_{\mathrm{finite}}\;
+\exists N_{\mathrm{finite}}\;
+\forall t_{\mathrm{finite}},
+\qquad
+|\Delta\pi_{N+t}|
+<
+\frac{1}{k+1}.
+}
+\]
+
+The inequality is implemented by exact finite cross-multiplication,
+not by floating-point division.
+
+This is stronger than the existence of isolated small residuals.  It
+is an explicit finite modulus controlling the entire subsequently
+constructed tail.
+
+\subsection{Permanent finite non-attainment}
+
+The very same exact correction family also satisfies
+\[
+\boxed{
+\forall n_{\mathrm{finite}},
+\qquad
+\Delta\pi_n\neq0.
+}
+\]
+
+Thus the same source simultaneously possesses
+\[
+\text{arbitrarily fine full-tail convergence toward zero}
+\]
+and
+\[
+\text{permanent finite non-attainment of zero}.
+\]
+
+Consequently,
+\[
+\boxed{
+\text{full-tail convergence to zero}
+\not\Rightarrow
+\text{finite exact-zero attainment}.
+}
+\]
+
+No contradiction is involved.  The two expressions denote different
+predicates.
+
+\subsection{Local full-tail zero predicate versus finite-stage equality}
+
+The formal development defines the local predicate
+\[
+\mathsf{CauchyEqZero}(q)
+\]
+as the following explicit full-tail convergence-to-zero criterion:
+\[
+\forall k\;
+\exists N\;
+\forall t,\qquad
+|q_{N+t}|<\frac{1}{k+1}.
+\]
+
+It separately defines finite operational attainment:
+\[
+\mathsf{FiniteZeroAttained}(q)
+\;:\Longleftrightarrow\;
+\exists n_{\mathrm{finite}}\,
+\mathsf{ExactZero}(q_n).
+\]
+
+For the Gregory correction family, the kernel proves
+\[
+\mathsf{CauchyEqZero}(\Delta\pi)
+\]
+while simultaneously proving
+\[
+\neg\mathsf{FiniteZeroAttained}(\Delta\pi).
+\]
+
+Equivalently,
+\[
+\boxed{
+\mathsf{CauchySemanticZero}(\Delta\pi)
+\;\land\;
+\neg\mathsf{FiniteOperationalZero}(\Delta\pi).
+}
+\]
+
+The notation \(\mathsf{CauchyEqZero}\) is local to this formal
+development and always means the displayed full-tail
+convergence-to-zero predicate. No claim is made that it is a general
+Cauchy equality relation or that it is definitionally identical to
+the equality implementation of CoRN or any other specific
+constructive-real library.
+
+\subsection{The witness-extraction barrier}
+
+The separation is strengthened by a direct universal refutation:
+\[
+\boxed{
+\neg\left[
+\forall q,\;
+\mathsf{CauchyEqZero}(q)
+\rightarrow
+\exists n_{\mathrm{finite}}\,
+\mathsf{ExactZero}(q_n)
+\right].
+}
+\]
+
+The development also proves that no universal function can take an
+arbitrary family \(q\), together with a proof of
+\(\mathsf{CauchyEqZero}(q)\), and always return a finite index whose
+member is exactly zero.
+
+In operational language:
+\[
+\boxed{
+\text{a tail-zero certificate does not contain a universal
+finite exact-zero witness extractor.}
+}
+\]
+
+\subsection{Consequence for completion semantics}
+
+The following formal statement is parameterized by an arbitrary
+completion predicate. It does not claim that all completed-real
+implementations use the same equality relation.
+
+Let
+\[
+\mathsf{CompletedEqZero}
+:
+(\mathsf{UFin}\to\mathsf{SignedFracCode})
+\to
+\mathsf{Prop}
+\]
+be an arbitrary completion predicate satisfying
+\[
+\mathsf{CauchyEqZero}(q)
+\rightarrow
+\mathsf{CompletedEqZero}(q).
+\]
+
+The Lean development proves that any such semantics necessarily admits
+a case that it accepts as zero although no finite member of that case
+is exactly zero.
+
+Therefore, in general,
+\[
+\boxed{
+\mathsf{CompletedEqZero}(q)
+\not\Rightarrow
+\mathsf{FiniteOperationalZero}(q).
+}
+\]
+
+Any completion predicate satisfying the displayed implication may
+therefore classify such a case as zero inside its own semantics
+without thereby supplying the finite operational attainment
+certificate examined in this paper.
+
+\subsection{Formal theorem}
+
+\begin{quote}
+\textbf{Theorem --- Cauchy-Style Full-Tail Zero Does Not Imply
+Finite Attainment.}
+
+For the exact finite Gregory correction family \(\Delta\pi\),
+\[
+\mathsf{CauchyEqZero}(\Delta\pi)
+\]
+and
+\[
+\forall n_{\mathrm{finite}},
+\qquad
+\neg\mathsf{ExactZero}(\Delta\pi_n).
+\]
+Consequently,
+\[
+\neg\left(
+\forall q,\;
+\mathsf{CauchyEqZero}(q)
+\rightarrow
+\exists n_{\mathrm{finite}}\,
+\mathsf{ExactZero}(q_n)
+\right).
+\]
+Moreover, no universal finite exact-zero witness extractor exists from
+a proof of \(\mathsf{CauchyEqZero}(q)\).
+
+\textbf{Kernel status:} axiom-free in the finite core.
+\end{quote}
+
+\subsection{Formal audit and scope}
+
+The canonical source is
+\begin{center}
+\path{PiQuasi/CauchyEquivalenceDoesNotImplyFiniteAttainment.lean}
+\end{center}
+
+with source SHA-256
+\begin{center}
+\path{757631012fe87a914b661670ec86728b57f6bdd394ba8e787669fd967cfbae44}.
+\end{center}
+
+The frozen checkpoint is
+\begin{center}
+\path{CAUCHY_EQUIVALENCE_NONATTAINMENT_V5_FROZEN_20260821T221100-0300}.
+\end{center}
+
+Its manifest SHA-256 is
+\begin{center}
+\path{e631c8289685799e1cfffa2bb000ee8d6683fa7007ecb7091275b291789fd068},
+\end{center}
+and its archive SHA-256 is
+\begin{center}
+\path{2534a9302bce13dd2e927431aac54dee8d15d0e0e671c5cc20c4f49bdd921eb2}.
+\end{center}
+
+The module builds under Lean 4.33.0-rc1 without Mathlib or Std imports
+and without host \texttt{Nat}, \texttt{Int}, \texttt{Rat},
+\texttt{Float}, \texttt{Quot.sound}, \texttt{Classical.choice},
+\texttt{propext}, \texttt{sorry}, local axioms, \texttt{admit},
+\texttt{unsafe}, or \texttt{partial}.
+
+No claim is made here about the correctness of Bishop-style
+constructive analysis, the validity of Cauchy-real constructions, the
+consistency of CoRN, or the internal correctness of completed classical
+or constructive circle identities.
+
+The conclusion is narrower:
+\[
+\boxed{
+\text{completion semantics}
+\neq
+\text{finite operational attainment}.
+}
+\]
+
+
+
+\section{What Is Old, What Is New, and What Is Not Claimed}
+\label{sec:old-new-not-claimed}
+
+None of the following is claimed as new: real-number completion,
+classical or constructive limit theory, the fact that a convergent
+sequence need not attain its limit at a finite index, the distinction
+between potential and actual infinity, strict finitism, feasibility
+mathematics, or constructive analysis.
+
+These subjects have substantial prior histories. Likewise, the fact
+that every finite Gregory--Leibniz correction is nonzero is elementary.
+The role of formal verification here is not to make that arithmetic
+fact deeper than it is. Its role is to prevent substitution between
+different predicates while the argument crosses finite generation,
+convergence, completion and geometry.
+
+The contribution claimed here is narrower.
+
+For one concrete traditional-\(\pi\) generating process, the kernel
+simultaneously verifies an explicit arbitrarily fine full-tail
+convergence criterion and permanent nonzero value at every finitely
+constructed stage. It then proves that the full-tail zero predicate
+does not universally imply finite exact-zero attainment, and that no
+universal finite witness extractor exists from the former predicate to
+the latter.
+
+The same generating process is independently connected to
+circumference stages and genuine real-coordinate Euclidean traversal.
+In the classical layer,
+\[
+G_r(2\pi r)=G_r(0)
+\]
+is granted, while consecutive finite Gregory-generated endpoints are
+proved not to stabilize.
+
+Thus the contribution is not the observation that limits can remain
+unattained. It is the kernel-audited separation, in one concrete
+traditional-\(\pi\) construction, of
+\[
+\boxed{
+\begin{aligned}
+&\text{finite generation}\\
+&\neq\ \text{full-tail convergence}\\
+&\neq\ \text{completion equality}\\
+&\neq\ \text{finite attainment}\\
+&\neq\ \text{finite-stage stabilization}.
+\end{aligned}
+}
+\]
+
+Saying that completion theory ``solved the problem decades ago'' is
+correct if the problem means constructing a complete number system in
+which convergent processes possess exact semantic limits.
+
+That is not the proposition tested here.
+
+Completion supplies an exact object in the completed semantics. It
+does not thereby prove that a finite member of the generating process
+attains that object.
+
+\[
+\boxed{
+\textbf{Completion is a solution to completeness;
+it is not a theorem of finite attainment.}
+}
+\]
+
+No priority claim is made for the general distinction between
+convergence and attainment. The contribution claimed here lies in the
+concrete formal instantiation, cross-semantic comparison,
+witness-extraction barrier, Euclidean finite-stage bridge and
+reproducible kernel audit.
+
+
+\section{The Mathematics, Not the Proof Assistant}
+\label{sec:mathematics-not-assistant}
+
+This essay is not fundamentally about Lean, Coq, Isabelle, CVC5,
+Z3, or any other proof assistant.
+
+Those systems are instruments of audit. They can verify whether a
+stated conclusion follows from stated definitions, constructions and
+logical dependencies. They do not decide which foundational
+architecture mathematics must adopt.
+
+The question raised here is mathematical and foundational.
+
+Modern mathematics developed extraordinarily powerful completion
+machinery. Once completed real numbers, actually infinite totalities
+and the standard real constant \(\pi\) are admitted, many questions of
+exactness become internal questions of that completed semantics.
+Within the standard framework, \(\pi\) is an exact transcendental real
+number and the completed Euclidean circle closes exactly at
+\[
+2\pi r.
+\]
+
+This essay does not deny those internal results.
+
+It asks whether the historical success and canonical status of
+completion made a different foundational question largely unnecessary
+to ask:
+
+\[
+\boxed{
+\begin{aligned}
+&\textbf{Must exact circular mathematics depend on an actually}\\
+&\textbf{completed infinite object at all?}
+\end{aligned}
+}
+\]
+
+For the Gregory process studied here, the finitely generated stages
+possess no terminal correction-zero stage. Completion answers the
+limit problem by supplying an exact object in a richer semantic domain.
+
+That is mathematically coherent.
+
+But the existence of a coherent completed solution does not prove that
+every exact circular mathematics must use that same architecture.
+
+One may therefore ask:
+
+\[
+\boxed{
+\begin{minipage}{0.88\linewidth}
+Is there a finite, deterministic and exact circular constant, or a
+different exact circular arithmetic, that preserves the structural
+roles for which traditional \(\pi\) is used while admitting finite
+closure rather than actual-infinite completion?
+\end{minipage}
+}
+\]
+
+Traditional \(\pi\) being transcendental does not answer this question.
+Transcendence is a theorem about the standard real \(\pi\) within the
+usual number-theoretic framework.
+
+The new question is:
+
+\[
+\boxed{
+\begin{aligned}
+&\text{Must every useful exact theory of circular structure inherit the}\\
+&\text{same constant and the same completion semantics?}
+\end{aligned}
+}
+\]
+
+Traditional \(\pi\) is used without foundational change in models
+ranging from microscopic systems and engineering scales to planetary
+mechanics, astronomical dynamics and cosmological calculations. The
+physical scale changes; the foundational status of the constant does
+not.
+
+The point is not that \(\pi\) becomes a different number at different
+scales. It does not. The point is that the same completed
+transcendental constant is propagated across all of them.
+
+This leaves open a legitimate foundational question:
+
+\[
+\boxed{
+\begin{aligned}
+&\textbf{Is completed transcendental \(\pi\) mathematically necessary}\\
+&\textbf{for circular structure, or historically canonical?}
+\end{aligned}
+}
+\]
+
+The present paper does not establish the existence of an alternative
+constant or alternative circular arithmetic.
+
+It establishes a reason for reopening the question: completion
+semantics can provide exact closure without finite attainment, and
+even an explicit constructive full-tail convergence certificate does
+not collapse that distinction.
+
+
+\subsection{The Alternative Must Earn Its Replacement}
+
+Finite closure by itself would be insufficient.
+
+A proposed alternative must preserve, replace or explicitly account
+for the structural roles currently served by traditional \(\pi\).
+A serious candidate must state how it handles circumference-to-diameter
+proportionality, circular scaling with radius, angular periodicity,
+rotation composition, trigonometric coherence, circle and arc
+geometry, and identities linking circular and analytic structures.
+
+For every relevant property, the candidate must identify whether the
+property is preserved exactly, transformed into a new exact law, or
+abandoned.
+
+A rational number that merely makes arithmetic finite is therefore not,
+by that fact alone, a replacement for \(\pi\).
+
+The challenge is constructive, not rhetorical.
+
+\[
+\boxed{
+\begin{aligned}
+&\textbf{The question is not whether traditional \(\pi\) works. It does.}\\
+&\textbf{The question is whether it is the only exact mathematical}\\
+&\textbf{architecture available for circular structure.}
+\end{aligned}
+}
+\]
+
+The research program is therefore not merely ``formalize the same
+mathematics in more proof assistants.''
+
+It is
+
+\[
+\boxed{
+\begin{aligned}
+&\textbf{search for finite exact circular mathematics that does not}\\
+&\textbf{require actual-infinite completion in order to obtain closure.}
+\end{aligned}
+}
+\]
+
+Completion made the classical limit problem solvable within a
+completed semantics. It may also have made a different question
+unnecessary to ask.
+
+This essay asks that question again.
+
+\section{Research Program and Remaining Open Boundaries}
+
+The present essay closes several finite formal results but does not
+close the broader research program. Three extensions are especially
+important if the finite-attainment framework is to develop from a
+foundational essay into a general research architecture.
+
+
+\subsection{I. From an Open Geometry Obligation to a Classical Euclidean Cross-Check}
+
+The earlier version of this essay listed construction of an
+independently meaningful geometric bridge as an open objective.
+V1.5 closes a substantial form of that obligation.
+
+The new adversarial layer uses actual real coordinates and the
+classical trigonometric traversal
+\[
+G_r(s)=
+\left(
+r\cos(s/r),
+r\sin(s/r)
+\right),
+\]
+proves the circle law
+\[
+x^2+y^2=r^2,
+\]
+connects the Gregory correction to the exact difference of consecutive
+Gregory stages, transports that identity to circumference stages, and
+proves, in the paper's nonempty-stage indexing,
+\[
+G_r(C_{n+1})\neq G_r(C_n)
+\]
+for every finite \(n\) and every nonzero \(r\).
+
+Accordingly, an independent Euclidean realization of finite-stage
+non-stabilization is no longer an open objective.
+
+What remains outside the theorem is deliberately different: V1.5 does
+not claim that the completed classical traversal at length $2\pi r$
+fails to return to its initial point.  The classical identity
+\[
+G_r(2\pi r)=G_r(0)
+\]
+is granted in the adversarial semantic layer.
+
+
+\subsection{II. Direct Formal Comparison with Classical Reals and ZFC}
+
+The second objective is a direct formal confrontation with at least one
+standard construction of completed real numbers and, separately, with a
+representative set-theoretic treatment of completed infinite totalities.
+
+The question is not merely whether those systems can represent a
+completed object. They can. The intended comparison asks exactly where
+the transition occurs between
+
+\[
+\text{finite generating history}
+\]
+
+and
+
+\[
+\text{completed mathematical object}.
+\]
+
+A future formal comparison should identify the assumptions, constructors,
+axioms, quotient structures, limit principles, or set-existence
+principles responsible for that transition and compare them directly
+with the finite-attainment regime developed here.
+
+For ZFC, this does not presuppose that a contradiction will be found.
+The immediate research target is more precise:
+
+\[
+\boxed{
+\text{locate and formalize the exact completion commitment}
+}
+\]
+
+and then determine which finite-provenance claims do or do not follow
+from it.
+
+\[
+\boxed{
+\text{CLASSICAL REAL/ZFC COMPARISON}
+=
+\text{OPEN RESEARCH TARGET}
+}
+\]
+
+\subsection{III. Generalization Beyond \(\pi\)}
+
+The third objective is to determine whether
+
+\[
+\text{finite attainment}
+\neq
+\text{actual completion}
+\]
+
+is a general architecture rather than a phenomenon tied to the
+Gregory--Leibniz example.
+
+A general theory should begin with an arbitrary finitely generated
+nonterminal process
+
+\[
+S_0,\;S_1,\;S_2,\ldots
+\]
+
+represented without assuming an actually completed sequence, together
+with an explicit completion extension \(C\).
+
+The desired abstract theorem schema is:
+
+\[
+\left(
+\forall s_{\mathrm{finite}},
+\neg\operatorname{Terminal}(s)
+\right)
+\Longrightarrow
+\operatorname{Completion}(C)
+\text{ has no final finite generating stage}.
+\]
+
+Further questions then arise:
+
+\begin{itemize}
+\item Which completion constructions satisfy the schema?
+\item Which representations preserve the finite provenance barrier?
+\item Which classical limit constructions introduce genuinely new
+ontological objects?
+\item Which mathematical constants, sequences, spaces, and infinite
+structures instantiate the same pattern?
+\item Which counterexamples delimit the generality of the framework?
+\end{itemize}
+
+If such an abstraction can be proved independently of \(\pi\), the
+present example becomes an instance of a more general theory of finite
+attainment and actual completion.
+
+\[
+\boxed{
+\text{GENERAL FINITE-ATTAINMENT THEORY}
+=
+\text{OPEN RESEARCH TARGET}
+}
+\]
+
+\subsection{Research-Level Status}
+
+These three extensions are not asserted as completed results of the
+present essay.
+
+They define the next research frontier:
+
+\[
+\boxed{
+\begin{aligned}
+&\text{independent geometry},\\
+&\text{direct classical-foundation comparison},\\
+&\text{general theory beyond }\pi.
+\end{aligned}
+}
+\]
+
+The kernel-checked results already established remain valid independently
+of whether these future targets succeed.
+
+If the three directions can themselves be closed with comparable formal
+auditing, the work would move from a specialized foundational essay
+toward a substantially broader theory of finite attainment and actual
+completion.
+
+
+\section*{Programmatic Closing Statement}
+
+This essay does not close the case against actual infinity.
+
+It establishes a finite formal foothold from which that case can be
+developed further.
+
+Some components of the argument are closed theorems. Other components
+are explicit bridge obligations. Still others are foundational
+interpretations and open research directions.
+
+This separation is intentional.
+
+\[
+\boxed{
+\text{theorem closed}
+\not\Rightarrow
+\text{research program closed}
+}
+\]
+
+The present work should therefore be understood as an audited stage of
+a broader investigation into the distinction between finite
+construction and actual completion.
+
+The challenge to actual infinity remains open for extension,
+counterexample, strengthening, and independent formal scrutiny.
+
+\section*{AI-Assisted Development Disclosure}
+
+Artificial intelligence systems were used extensively during the
+development of this work for drafting, code generation, debugging,
+formalization support, adversarial checking, and editorial refinement.
+
+This assistance is neither hidden nor treated as a substitute for
+verification.
+
+\begin{quote}
+\textbf{Yes, I used AI. Deliberately, extensively, and transparently.
+I will continue to use AI wherever it improves reasoning,
+implementation, verification, or discovery. The scientific question is
+not whether AI assisted the work, but whether the resulting claims
+survive independent and exact verification.}
+\end{quote}
+
+In this project, formal mathematical claims are not accepted because an
+AI system produced or endorsed them. Their formal status is determined
+by the Lean kernel and by the explicitly reported dependency audit.
+
+Accordingly:
+\[
+\boxed{
+\text{AI assistance}
+\neq
+\text{proof authority}.
+}
+\]
+
+The proof authority for the formal results is the checked proof term
+accepted by the specified Lean kernel under the declared restrictions.
+
+\section*{Formal Reproducibility}
+
+Lean environment:
+\begin{verbatim}
+Lean 4.33.0-rc1
+toolchain: leanprover/lean4:v4.33.0-rc1
+\end{verbatim}
+
+Final source:
+\begin{verbatim}
+PiQuasi/UltrafinitaryPiFinalBarrier.lean
+SHA256:
+fa1b1253543542c1fde92f779a6405f20c1bc30b9bbac2d05676cb34edcfadb1
+\end{verbatim}
+
+Final compiled module:
+\begin{verbatim}
+PiQuasi/UltrafinitaryPiFinalBarrier.olean
+SHA256:
+a9a43e4cbca573f2a42dc8855374c1074adb67d28d72ad56bee77b8cd0781548
+\end{verbatim}
+
+Canonical frozen checkpoint:
+\begin{verbatim}
+/home/eduardo/Downloads/pi_quasi_circle/FROZEN_CHECKPOINTS/
+ULTRAFINITARY_PI_ACTUAL_INFINITY_FINAL_BARRIER_FROZEN_
+20260821T162113-0300
+\end{verbatim}
+
+Frozen archive SHA256:
+\begin{verbatim}
+fe73ebada7e1ef18e66e07cd7f7805071e7f5ef034f7d5aa0076275331655c5a
+\end{verbatim}
+
+Final formal status:
+\begin{verbatim}
+PASS_ULTRAFINITARY_PI_ACTUAL_INFINITY_FINAL_BARRIER
+\end{verbatim}
+
+
+\subsection*{V1.5.1 Cauchy / finite-attainment module}
+
+The constructive full-tail adversarial result is contained in
+\begin{center}
+\path{PiQuasi/CauchyEquivalenceDoesNotImplyFiniteAttainment.lean}
+\end{center}
+
+Source SHA-256:
+\begin{center}
+\path{757631012fe87a914b661670ec86728b57f6bdd394ba8e787669fd967cfbae44}
+\end{center}
+
+Frozen checkpoint:
+\begin{center}
+\path{FROZEN_CHECKPOINTS/CAUCHY_EQUIVALENCE_NONATTAINMENT_V5_FROZEN_20260821T221100-0300}
+\end{center}
+
+Manifest SHA-256:
+\begin{center}
+\path{e631c8289685799e1cfffa2bb000ee8d6683fa7007ecb7091275b291789fd068}
+\end{center}
+
+Archive SHA-256:
+\begin{center}
+\path{2534a9302bce13dd2e927431aac54dee8d15d0e0e671c5cc20c4f49bdd921eb2}
+\end{center}
+
+The audited status is:
+\begin{verbatim}
+[CAUCHY_FULL_TAIL_MODULUS]=CLOSED
+[GREGORY_POINTWISE_NONZERO]=CLOSED
+[CAUCHY_EQ_ZERO_IMPLIES_FINITE_ZERO]=FORMALLY_FALSE
+[CAUCHY_ZERO_FINITE_WITNESS_EXTRACTOR]=IMPOSSIBLE
+[SEMANTIC_ZERO_VS_OPERATIONAL_ZERO]=FORMALLY_SEPARATED
+[COMPLETED_EQUALITY_ACCEPTING_CAUCHY_NONATTAINED_CASE]=CLOSED
+[QUOT_USED]=NO
+[CLASSICAL_CHOICE]=NO
+[PROPEXT]=NO
+[FLOAT_USED]=NO
+[HOST_NUMERIC_TYPES_USED]=NO
+[AXIOMS]=NONE
+[FINAL_STATUS]=PASS_CAUCHY_EQUIVALENCE_NONATTAINMENT_V5_FROZEN
+\end{verbatim}
+
+
+
+\subsection*{V1.5.2 editorial and foundational status}
+
+V1.5.2 introduces no new formal theorem and modifies no frozen Lean
+source. Its mathematical formal claims are inherited from the frozen
+V1.5.1 publication checkpoint and from the independently frozen Cauchy
+finite-attainment module.
+
+The additions concern novelty delimitation, foundational scope,
+reviewer objections and the statement of an open constructive research
+program.
+
+\begin{verbatim}
+[V1_5_2_NEW_FORMAL_THEOREM]=NO
+[V1_5_1_FORMAL_RESULTS_REUSED]=YES
+[CAUCHY_FORMAL_RESULTS_REUSED]=YES
+[PROOF_ASSISTANT_IS_SCIENTIFIC_THESIS]=NO
+[CONVERGENCE_VS_ATTAINMENT_CLAIMED_AS_NEW]=NO
+[ALTERNATIVE_CIRCULAR_CONSTANT_EXISTENCE_PROVED]=NO
+[ALTERNATIVE_CIRCULAR_ARITHMETIC_EXISTENCE_PROVED]=NO
+[ALTERNATIVE_CIRCULAR_ARCHITECTURE]=OPEN_RESEARCH_QUESTION
+\end{verbatim}
+
+
+\subsection*{V1.5.3 reviewer-adversarial hardening}
+
+V1.5.3 adds two formal results in the classical adversarial layer and
+one explicit host-metatheory clarification.  It does not alter the
+frozen finite core, and it does not present the elementary fact that
+convergence need not imply finite attainment as a new theorem.
+
+\paragraph{Host metatheory versus object-level finiteness.}
+Lean is used as an audit host; Lean itself is not claimed to be
+ultrafinitary.  Quantification over all values of the inductively
+generated finite-stage type is not claimed to be a finite enumeration.
+The formal question is instead whether a terminal finite witness is
+exhibited.  Reasoning about all represented finite stages is therefore
+kept distinct from producing a terminal represented finite stage.
+
+\paragraph{Finite Euclidean return-to-start barrier.}
+In the classical Euclidean bridge, standard real trigonometry,
+traditional \(\pi\), and the completed classical circle are granted.
+For nonzero radius, every nonempty finite Gregory-generated traversal
+stage is nevertheless proved distinct from the starting point.  After
+translating the implementation index to the paper's nonempty-stage
+indexing, the result is
+\[
+\boxed{
+r\neq0
+\quad\Longrightarrow\quad
+G_r(C_n)\neq G_r(0)
+}
+\]
+for every finite \(n\).
+This strengthens the earlier consecutive-endpoint non-stabilization
+result: the formal obstruction is not merely failure of two
+consecutive finite endpoints to coincide, but failure of any
+nontrivial finite Gregory stage in this bridge to return exactly to
+the start.  The different completed identity
+\[
+G_r(2\pi r)=G_r(0)
+\]
+remains granted.
+
+\paragraph{Concrete real-completion provenance.}
+The classical completion module constructs the rational Gregory
+generator as a genuine Mathlib Cauchy sequence
+\[
+G:\operatorname{CauSeq}(\mathbb Q)
+\]
+and uses Mathlib's concrete real constructor
+\(\operatorname{Real.mk}\).  The kernel-checked result is
+\[
+\boxed{
+\operatorname{Real.mk}(G)=\pi
+\quad\land\quad
+\forall n\in\mathbb N,\;
+(G_n:\mathbb R)\neq\pi .
+}
+\]
+Thus the same formal development simultaneously grants the completed
+real equality and proves the absence of a finite Gregory stage equal
+to that completed value.
+
+The relevant implementation path is the actual Mathlib
+Cauchy-completion architecture:
+\[
+\operatorname{CauSeq}(\mathbb Q)
+\longrightarrow
+\operatorname{CauSeq.Completion}
+\longrightarrow
+\operatorname{Real.mk}
+\longrightarrow
+\mathbb R.
+\]
+This is a provenance statement about the concrete comparison semantics;
+it is not a claim that the completion construction is erroneous.
+
+The canonical V1.5.3-C source is
+\begin{center}
+\path{CLASSICAL_ADVERSARIAL_BRIDGE/ClassicalRealCompletionProvenance.lean}
+\end{center}
+with source SHA-256
+\begin{center}
+\texttt{868ebbb4876ab8145ed550e25c514e85e85eaf4d8733a662b69c1676c430aa3c}.
+\end{center}
+
+The V1.5.3-C theorem audit reports no \texttt{sorryAx}.  Because this
+module deliberately lives in the classical Mathlib comparison layer,
+its reported external dependencies are
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+These dependencies are not attributed to the axiom-free finite core.
+
+\begin{verbatim}
+[V1_5_3_A_FINITE_RETURN_TO_START]=CLOSED
+[V1_5_3_B_LEAN_ROLE]=AUDIT_HOST
+[V1_5_3_B_LEAN_IS_ULTRAFINITARY]=NOT_CLAIMED
+[V1_5_3_C_CONCRETE_COMPLETION]=CLOSED
+[V1_5_3_C_REAL_MK_GREGORY_EQ_PI]=CLOSED
+[V1_5_3_C_FINITE_GREGORY_STAGE_EQ_PI]=NO
+[V1_5_3_C_SORRYAX]=NO
+[V1_5_3_C_CLASSICAL_MATHLIB_LAYER]=YES
+[CONVERGENCE_VS_ATTAINMENT_CLAIMED_AS_NEW]=NO
+[FULL_CLASSICAL_CIRCLE_NONCLOSURE_CLAIMED]=NO
+[NPI_USED]=NO
+\end{verbatim}
+
+\section{Conclusion}
+
+The result that survives the full adversarial audit is not the claim
+that ``\(\pi\) does not close the circle.''  The completed classical
+identity
+\[
+G_r(2\pi r)=G_r(0)
+\]
+is explicitly granted.
+
+The surviving claim is narrower:
+
+\[
+\boxed{
+\textbf{completion is not a finite-witness extractor.}
+}
+\]
+
+More precisely, exact semantic completion does not, merely by virtue
+of being exact completion, entail a terminal finite attainment event
+in the originating generator.
+
+The finite core supplies the first witness to this separation.  For
+the exact Gregory correction family,
+\[
+\mathsf{CauchyEqZero}(\Delta\pi)
+\]
+holds in the paper's local explicit full-tail sense, while
+\[
+\neg\mathsf{FiniteZeroAttained}(\Delta\pi)
+\]
+also holds.  Consequently the universal implication
+\[
+\forall q,\;
+\mathsf{CauchyEqZero}(q)
+\rightarrow
+\exists n_{\mathrm{finite}}\,
+\mathsf{ExactZero}(q_n)
+\]
+is formally false in the audited regime, and no universal finite
+exact-zero witness extractor exists from that certificate.
+
+The classical adversarial layer supplies a second, geometrically
+stronger manifestation.  Traditional real \(\pi\), standard
+trigonometry, the circle equation, and completed Euclidean closure are
+all granted.  Nevertheless, for every finite nonempty Gregory stage
+and nonzero radius,
+\[
+G_r(C_n)\neq G_r(0).
+\]
+Thus no finite stage in the audited Gregory traversal realizes the
+completed return-to-start event.
+
+The concrete Mathlib completion provenance supplies the third and most
+direct comparison:
+\[
+\boxed{
+\operatorname{Real.mk}(G)=\pi
+\quad\land\quad
+\forall n\in\mathbb N,\;(G_n:\mathbb R)\neq\pi.
+}
+\]
+The completed equality and finite nonattainment therefore coexist in
+one formally connected construction.
+
+This is the exact scope of the counterexample.  Any completion
+predicate that accepts the exhibited full-tail-zero case cannot use
+that semantic acceptance \emph{alone} as a universal guarantee of
+finite operational zero.  Additional witness-producing structure could
+of course be supplied by a richer formalism; such additional data
+would be precisely that---additional structure, not a consequence
+obtained for free from semantic completion.
+
+Accordingly, the paper does not refute classical completeness, does
+not deny the existence of traditional real \(\pi\), and does not deny
+the completed Euclidean circle identity.  It refutes a stronger bridge
+principle:
+
+\[
+\boxed{
+\text{completed semantic equality}
+\;\not\Rightarrow\;
+\text{finite terminal attainment}
+}
+\]
+
+for the concrete family exhibited here.
+
+The relevant foundational cost is consequently visible rather than
+implicit.  The finite generator supplies its indefinitely extensible
+stages; the completed semantics supplies an exact completed object.
+Those two facts are compatible.  What the formal development rejects
+is the additional identification of the completed object with a
+finite terminal stage when no such stage exists.
+
+The Mathlib comparison makes that boundary inspectable through the
+concrete Cauchy-completion architecture.  The classical V1.5.3 theorem
+audit reports the external dependencies
+\texttt{propext}, \texttt{Classical.choice}, and
+\texttt{Quot.sound}, with no \texttt{sorryAx}.  This audit records the
+dependencies of the granted classical comparison layer; it is not, by
+itself, a theorem that those individual axioms are the unique
+ontological source of actual infinity.
+
+Finally, the machine-readable status blocks throughout the paper must
+be read with their declared scope.  A flag such as
+\texttt{[FINAL\_STATUS]=PASS...} certifies the named formal module,
+construction, or audit gate.  It does not enlarge the surrounding
+mathematical claim beyond the theorem actually proved.
+
+The formal foothold established here can therefore be summarized in
+one sentence:
+
+\begin{center}
+\textbf{A completion may be exact in its own semantics while the
+finite generating process contains no terminal stage witnessing that
+exactness.}
+\end{center}
+
+That is the claim proved here.  Nothing stronger is required for the
+foundational separation.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Cantor1895}
+G. Cantor,
+\emph{Beiträge zur Begründung der transfiniten Mengenlehre},
+Mathematische Annalen, 46 (1895).
+
+\bibitem{Cantor1897}
+G. Cantor,
+\emph{Beiträge zur Begründung der transfiniten Mengenlehre II},
+Mathematische Annalen, 49 (1897).
+
+\bibitem{Hilbert1926}
+D. Hilbert,
+\emph{Über das Unendliche},
+Mathematische Annalen, 95 (1926), 161--190.
+
+\bibitem{Brouwer1913}
+L. E. J. Brouwer,
+\emph{Intuitionism and Formalism},
+Bulletin of the American Mathematical Society,
+20 (1913), 81--96.
+
+\bibitem{Heyting1956}
+A. Heyting,
+\emph{Intuitionism: An Introduction},
+North-Holland, Amsterdam, 1956.
+
+\bibitem{Bishop1967}
+E. Bishop,
+\emph{Foundations of Constructive Analysis},
+McGraw-Hill, New York, 1967.
+
+\bibitem{Lean4}
+L. de Moura and S. Ullrich,
+\emph{The Lean 4 Theorem Prover and Programming Language},
+CADE-28, 2021.
+
+
+\bibitem{SEPBrouwer}
+Stanford Encyclopedia of Philosophy,
+``Luitzen Egbertus Jan Brouwer,''
+Fall 2025 archival edition.
+\url{https://plato.stanford.edu/archives/fall2025/entries/brouwer/}
+
+\bibitem{SEPIntuitionism}
+Stanford Encyclopedia of Philosophy,
+``Intuitionism in the Philosophy of Mathematics,''
+archival edition.
+\url{https://plato.stanford.edu/archives/fall2020/entries/intuitionism/}
+
+\bibitem{SEPConstructiveMathematics}
+Stanford Encyclopedia of Philosophy,
+``Constructive Mathematics.''
+\url{https://plato.stanford.edu/entries/mathematics-constructive/}
+
+\bibitem{SEPHilbertProgram}
+Stanford Encyclopedia of Philosophy,
+``Hilbert's Program.''
+\url{https://plato.stanford.edu/entries/hilbert-program/}
+
+\bibitem{SEPGodelHilbert}
+Stanford Encyclopedia of Philosophy,
+``Did the Incompleteness Theorems Refute Hilbert's Program?''
+\url{https://plato.stanford.edu/entries/goedel/incompleteness-hilbert.html}
+
+\bibitem{MacTutorRamanujan}
+MacTutor History of Mathematics Archive,
+``Srinivasa Ramanujan.''
+University of St Andrews.
+\url{https://mathshistory.st-andrews.ac.uk/Biographies/Ramanujan/}
+
+\bibitem{SEPEarlySetTheory}
+Stanford Encyclopedia of Philosophy,
+``The Early Development of Set Theory.''
+\url{https://plato.stanford.edu/entries/settheory-early/}
+
+
+
+\bibitem{YesseninVolpin1970}
+A.~S. Yessenin--Volpin,
+``The Ultra-Intuitionistic Criticism and the Antitraditional Program
+for Foundations of Mathematics,''
+in A.~Kino, J.~Myhill, and R.~E. Vesley (eds.),
+\emph{Intuitionism and Proof Theory},
+North-Holland, Amsterdam, 1970, pp.~3--45.
+
+\bibitem{Parikh1971}
+R.~Parikh,
+``Existence and Feasibility in Arithmetic,''
+\emph{The Journal of Symbolic Logic},
+vol.~36, no.~3, 1971, pp.~494--508,
+doi:10.2307/2269958.
+
+\bibitem{Sazonov1995}
+V.~Yu. Sazonov,
+``On Feasible Numbers,''
+in D.~Leivant (ed.),
+\emph{Logic and Computational Complexity},
+Lecture Notes in Computer Science, vol.~960,
+Springer, 1995, pp.~30--51.
+
+\bibitem{Nelson1986}
+E.~Nelson,
+\emph{Predicative Arithmetic},
+Mathematical Notes, vol.~32,
+Princeton University Press, Princeton, 1986.
+
+\end{thebibliography}
+
+
+
+\section*{Publication provenance}
+
+{\scriptsize
+
+\noindent
+The formal mathematics and the publication text are preserved through
+distinct immutable checkpoints.
+
+\medskip
+\noindent
+\textbf{Formal-core checkpoint:}\\
+\texttt{\detokenize{PI_QUASI_V1_4_ULTRADETERMINIST_CIRCUMFERENCE_FROZEN_20260821T192302-0300}}\\
+Manifest SHA-256:
+\texttt{\detokenize{a8a4599e95e51d91d0a12577066e842819ff53bd886c285fd75557239263d2a9}}\\
+Archive SHA-256:
+\texttt{\detokenize{4672eabaa44dcca3ba708c73ff3c2b0d642d9add891391989b724442b9af33a3}}.
+
+\medskip
+\noindent
+\textbf{Final editorial freeze:}\\
+\texttt{\detokenize{PI_QUASI_V1_4_1_EDITORIAL_FINAL_FROZEN_20260821T193311-0300}}\\
+Manifest SHA-256:
+\texttt{\detokenize{ab285562b39a80eb995cd14653057db830df50098b07e439e3e4643ad10cadf7}}\\
+Archive SHA-256:
+\texttt{\detokenize{8078ce5f6a36408b2828b55deb59905d71f6355e1593ad9e53f280a2a53b2269}}.
+
+\medskip
+\noindent
+The V1.4.1 editorial and publication changes do not modify the frozen
+formal mathematics.
+
+}
+
+\end{document}

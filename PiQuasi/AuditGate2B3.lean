@@ -1,0 +1,10 @@
+import PiQuasi.FinitePiBracket
+
+#print axioms PiQuasi.pToU_ne_zero
+#print axioms PiQuasi.positive_fraction_numerator_ne_zero
+#print axioms PiQuasi.finite_pi_bracket_ne_collapsed
+#print axioms PiQuasi.traditional_pi_finite_state_not_exact
+#print axioms PiQuasi.no_finite_exact_pi_witness
+#print axioms PiQuasi.traditional_pi_circle_attempt_not_closed
+#print axioms PiQuasi.leakage_numerator_ne_zero
+#print axioms PiQuasi.every_finite_traditional_pi_attempt_is_quasi

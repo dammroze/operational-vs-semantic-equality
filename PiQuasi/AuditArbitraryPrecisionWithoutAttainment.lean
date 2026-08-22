@@ -1,0 +1,10 @@
+import PiQuasi.ArbitraryPrecisionWithoutAttainment
+
+#print axioms PiQuasi.dyadic_denominator_successor
+#print axioms PiQuasi.dyadic_residual_nonzero
+#print axioms PiQuasi.every_finite_dyadic_precision_request_is_reachable
+#print axioms PiQuasi.every_finite_precision_request_has_nonzero_residual
+#print axioms PiQuasi.arbitrary_finite_dyadic_precision
+#print axioms PiQuasi.no_dyadic_exact_target_attainment
+#print axioms PiQuasi.arbitrary_finite_precision_does_not_imply_exact_attainment
+#print axioms PiQuasi.arbitrary_precision_without_attainment

@@ -1,0 +1,6 @@
+import PiQuasi.ExternalLimitAttainmentBoundary
+
+#print axioms PiQuasi.external_limit_claim_does_not_force_pi_finite_attainment
+#print axioms PiQuasi.external_limit_claim_does_not_force_eventual_finite_stabilization
+#print axioms PiQuasi.external_limit_claim_does_not_force_dyadic_finite_attainment
+#print axioms PiQuasi.external_limit_compatible_with_no_finite_attainment

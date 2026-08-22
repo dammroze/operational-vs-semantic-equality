@@ -1,0 +1,11 @@
+import PiQuasi.CompletionNotAttainment
+
+#print axioms PiQuasi.finite_pi_never_eventually_closes
+#print axioms PiQuasi.added_completion_carries_closure
+#print axioms PiQuasi.completion_closed_has_no_finite_pi_origin
+#print axioms PiQuasi.added_completion_has_no_finite_pi_origin
+#print axioms PiQuasi.pi_closure_without_finite_attainment
+#print axioms PiQuasi.completion_closure_is_not_finite_attainment_result
+#print axioms PiQuasi.no_last_finite_closure_witness
+#print axioms PiQuasi.traditional_pi_circle_never_closes_at_finite_refinement
+#print axioms PiQuasi.traditional_pi_balloon_never_becomes_watertight

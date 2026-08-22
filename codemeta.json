@@ -1,0 +1,30 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Operational",
+  "version": "vs",
+  "datePublished": "Semantic",
+  "description": "A kernel-audited foundational study separating completed semantic equality from finite witness-producing attainment, using the traditional Gregory-Leibniz construction of pi as a concrete test case. The finite core proves a local explicit full-tail convergence-to-zero criterion together with finite nonattainment and a universal finite exact-zero witness-extraction barrier. A separate classical adversarial Mathlib layer grants traditional real pi and completed Euclidean closure, proves finite Euclidean non-return, and establishes Real.mk(G)=pi while every finite Gregory stage remains distinct from pi. The work does not claim inconsistency of classical real analysis, nonexistence of traditional real pi, or failure of completed classical Euclidean closure.",
+  "author": [
+    {
+      "@type": "Person",
+      "familyName": "Dammroze",
+      "givenName": "Eduardo Martinez",
+      "@id": "https://orcid.org/0009-0002-9395-7778"
+    }
+  ],
+  "programmingLanguage": [
+    "Lean 4",
+    "TeX"
+  ],
+  "keywords": [
+    "foundations of mathematics",
+    "finite attainment",
+    "completion semantics",
+    "Cauchy completion",
+    "Gregory-Leibniz",
+    "pi",
+    "Lean 4",
+    "formal verification"
+  ]
+}

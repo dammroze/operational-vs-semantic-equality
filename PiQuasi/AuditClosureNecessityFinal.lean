@@ -1,0 +1,10 @@
+import PiQuasi.ClosureNecessityFinal
+
+#print axioms PiQuasi.closed_circle_implies_pi_terminal
+#print axioms PiQuasi.finite_pi_circle_not_geometrically_closed
+#print axioms PiQuasi.no_finite_closed_traditional_pi_circle_witness
+#print axioms PiQuasi.water_tight_implies_closed_circle
+#print axioms PiQuasi.water_tight_implies_pi_terminal
+#print axioms PiQuasi.every_finite_traditional_pi_balloon_leaks
+#print axioms PiQuasi.no_finite_watertight_pi_balloon_witness
+#print axioms PiQuasi.persistent_pi_balloon_leakage

@@ -1,0 +1,6 @@
+import PiQuasi.FiniteRadixExclusion
+
+#print axioms PiQuasi.no_fraction_implies_no_finite_radix
+#print axioms PiQuasi.no_fraction_implies_no_exact_finite_arc
+#print axioms PiQuasi.no_fraction_implies_no_exact_finite_closed
+#print axioms PiQuasi.no_exact_finite_closed_by_refinement

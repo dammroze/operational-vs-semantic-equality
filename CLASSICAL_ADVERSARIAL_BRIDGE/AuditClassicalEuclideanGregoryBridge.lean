@@ -1,0 +1,10 @@
+import ClassicalEuclideanGregoryBridge
+
+#print axioms PiQuasiClassicalBridge.classical_leibniz_limit_is_granted
+#print axioms PiQuasiClassicalBridge.finite_gregory_stage_ne_classical_pi
+#print axioms PiQuasiClassicalBridge.finite_gregory_circumference_ne_classical
+#print axioms PiQuasiClassicalBridge.stereo_on_unit_circle
+#print axioms PiQuasiClassicalBridge.stereo_eq_start_iff
+#print axioms PiQuasiClassicalBridge.classical_pi_residual_nonzero
+#print axioms PiQuasiClassicalBridge.euclidean_residual_endpoint_ne_start
+#print axioms PiQuasiClassicalBridge.classical_euclidean_adversarial_closure

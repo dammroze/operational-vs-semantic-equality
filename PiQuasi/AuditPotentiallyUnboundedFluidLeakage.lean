@@ -1,0 +1,8 @@
+import PiQuasi.PotentiallyUnboundedFluidLeakage
+
+#print axioms PiQuasi.delay_successor_not_le_self
+#print axioms PiQuasi.no_finite_delay_ceiling
+#print axioms PiQuasi.fluid_run_next_delay_escapes
+#print axioms PiQuasi.open_boundary_potentially_unbounded_operational_leakage
+#print axioms PiQuasi.spatial_pi_model_potentially_unbounded_operational_leakage
+#print axioms PiQuasi.potentially_unbounded_physical_leakage_under_bridge

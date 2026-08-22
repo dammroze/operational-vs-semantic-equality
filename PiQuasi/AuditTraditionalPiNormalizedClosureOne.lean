@@ -1,0 +1,7 @@
+import PiQuasi.TraditionalPiNormalizedClosureOne
+
+#print axioms PiQuasi.closure_one_ne_zero
+#print axioms PiQuasi.normalized_closure_one_impossible
+#print axioms PiQuasi.normalized_closure_one_impossible_after_any_finite_refinement
+#print axioms PiQuasi.excel_style_closure_one_impossible
+#print axioms PiQuasi.traditional_pi_normalized_closure_final

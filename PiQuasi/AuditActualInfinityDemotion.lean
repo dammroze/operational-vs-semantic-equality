@@ -1,0 +1,20 @@
+import PiQuasi.ActualInfinityDemotion
+
+#print axioms PiQuasi.actual_completion_ne_finite
+#print axioms PiQuasi.actual_completion_ne_finite_iteration
+#print axioms PiQuasi.actual_completion_has_no_finite_preimage
+#print axioms PiQuasi.completion_is_strictly_outside_finite_image
+
+#print axioms PiQuasi.pi_actual_completion_ne_finite
+#print axioms PiQuasi.pi_actual_completion_ne_any_finite_refinement
+#print axioms PiQuasi.pi_actual_completion_has_no_finite_preimage
+
+#print axioms PiQuasi.added_actual_completion_is_closed
+#print axioms PiQuasi.no_finite_pi_extension_is_closed
+#print axioms PiQuasi.no_finite_refinement_reaches_completion_closure
+#print axioms PiQuasi.completion_closed_implies_added_constructor
+#print axioms PiQuasi.completion_closure_not_in_finite_image
+
+#print axioms PiQuasi.no_finite_stage_realizes_pi_circle_completion
+#print axioms PiQuasi.no_finite_stage_realizes_watertight_pi_balloon
+#print axioms PiQuasi.actual_completion_separation

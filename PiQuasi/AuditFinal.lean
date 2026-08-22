@@ -1,0 +1,5 @@
+import PiQuasi.PiQuasiCircleFinal
+
+#print axioms PiQuasi.no_finite_closed_traditional_pi_circle
+#print axioms PiQuasi.finite_traditional_pi_circle_is_quasi
+#print axioms PiQuasi.traditional_pi_has_no_finite_terminal

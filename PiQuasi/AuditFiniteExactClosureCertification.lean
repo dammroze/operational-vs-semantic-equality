@@ -1,0 +1,7 @@
+import PiQuasi.FiniteExactClosureCertification
+
+#print axioms PiQuasi.no_native_finite_exact_closure_certificate_under_bridge
+#print axioms PiQuasi.exact_closure_certification_requires_external_correction
+#print axioms PiQuasi.finite_process_not_natively_sufficient_under_bridge
+#print axioms PiQuasi.safety_critical_admission_requires_external_correction
+#print axioms PiQuasi.finite_closure_certification_separation

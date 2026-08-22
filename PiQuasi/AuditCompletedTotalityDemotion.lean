@@ -1,0 +1,18 @@
+import PiQuasi.CompletedTotalityDemotion
+
+#print axioms PiQuasi.stage_le_refl
+#print axioms PiQuasi.successor_not_in_own_initial_segment
+#print axioms PiQuasi.every_finite_totality_misses_successor
+#print axioms PiQuasi.no_finite_totality_contains_all
+#print axioms PiQuasi.no_finite_completed_totality_witness
+
+#print axioms PiQuasi.completed_totality_contains_all
+#print axioms PiQuasi.lifted_finite_totality_not_complete
+#print axioms PiQuasi.contains_all_implies_completed_constructor
+#print axioms PiQuasi.completed_totality_has_no_finite_origin
+#print axioms PiQuasi.completed_totality_ne_any_finite_totality
+
+#print axioms PiQuasi.finite_exhaustion_impossible
+#print axioms PiQuasi.extended_completed_totality_exists
+#print axioms PiQuasi.completed_totality_separation
+#print axioms PiQuasi.finite_totality_self_defeat

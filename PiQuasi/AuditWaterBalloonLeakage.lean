@@ -1,0 +1,10 @@
+import PiQuasi.WaterBalloonLeakage
+
+#print axioms PiQuasi.pi_seal_defect_nonzero
+#print axioms PiQuasi.membrane_never_sealed_at_finite_stage
+#print axioms PiQuasi.water_leakage_at_every_finite_stage
+#print axioms PiQuasi.water_leakage_after_refinement
+#print axioms PiQuasi.no_finite_water_tight_witness
+#print axioms PiQuasi.persistent_potential_leakage
+#print axioms PiQuasi.every_finite_pi_water_balloon_leaks
+#print axioms PiQuasi.no_finite_nonleaking_pi_balloon

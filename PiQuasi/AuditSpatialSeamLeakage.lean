@@ -1,0 +1,13 @@
+import PiQuasi.SpatialSeamLeakage
+
+#print axioms PiQuasi.pFour_to_uFour
+#print axioms PiQuasi.pi_seam_gap_numerator_nonzero
+#print axioms PiQuasi.seam_end_ne_start
+#print axioms PiQuasi.spatial_seam_open_every_finite_stage
+#print axioms PiQuasi.spatial_water_leakage_every_finite_stage
+#print axioms PiQuasi.spatial_water_leakage_after_refinement
+#print axioms PiQuasi.operational_leakage_iff_spatial_leakage
+#print axioms PiQuasi.no_finite_spatial_watertight_witness
+#print axioms PiQuasi.persistent_spatial_leakage
+#print axioms PiQuasi.every_finite_spatial_pi_balloon_leaks
+#print axioms PiQuasi.no_finite_spatial_nonleaking_balloon

@@ -1,0 +1,8 @@
+import PiQuasi.TraditionalPiPotential
+
+#print axioms PiQuasi.uFour_ne_zero
+#print axioms PiQuasi.gregory_pi_term_nonzero
+#print axioms PiQuasi.traditional_pi_stage_ne_terminal
+#print axioms PiQuasi.no_traditional_pi_finite_final_witness
+#print axioms PiQuasi.traditional_pi_operational_circle_not_closed
+#print axioms PiQuasi.every_finite_traditional_pi_circle_is_quasi

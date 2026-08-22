@@ -1,0 +1,17 @@
+import PiQuasi.UltrafinitaryPiFinalBarrier
+
+#print axioms PiQuasi.no_finite_representation_bridges_completion
+#print axioms PiQuasi.no_finite_encoding_creates_exact_pi
+#print axioms PiQuasi.no_finite_pi_closure_attainment
+#print axioms PiQuasi.no_finite_closed_pi_circle
+#print axioms PiQuasi.no_finite_watertight_pi_balloon
+#print axioms PiQuasi.no_finite_encoded_watertight_pi_balloon
+
+#print axioms PiQuasi.final_no_finite_exhaustion
+#print axioms PiQuasi.final_completed_totality_has_no_finite_origin
+#print axioms PiQuasi.final_extension_contains_completed_totality
+#print axioms PiQuasi.final_added_completion_carries_closure
+#print axioms PiQuasi.final_completion_closure_not_in_finite_chain
+
+#print axioms PiQuasi.ultrafinitary_pi_barrier
+#print axioms PiQuasi.operational_actual_infinity_demotion

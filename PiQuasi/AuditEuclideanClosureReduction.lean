@@ -1,0 +1,6 @@
+import PiQuasi.EuclideanClosureReduction
+
+#print axioms PiQuasi.euclidean_closure_forces_pi_terminal
+#print axioms PiQuasi.euclidean_endpoint_closure_impossible
+#print axioms PiQuasi.no_finite_euclidean_closure_witness
+#print axioms PiQuasi.euclidean_closure_reduction_result

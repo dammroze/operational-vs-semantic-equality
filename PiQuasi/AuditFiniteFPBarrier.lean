@@ -1,0 +1,18 @@
+import PiQuasi.FiniteFPBarrier
+
+#print axioms PiQuasi.u_next_ne_self
+#print axioms PiQuasi.finite_precision_ne_terminal
+#print axioms PiQuasi.every_finitely_increased_precision_is_nonterminal
+
+#print axioms PiQuasi.finite_fp_source_ne_actual_completion
+#print axioms PiQuasi.finite_fp_pi_never_closed
+#print axioms PiQuasi.increased_precision_still_not_closed
+#print axioms PiQuasi.arbitrary_finite_precision_still_not_closed
+#print axioms PiQuasi.no_finite_precision_eventually_closes
+
+#print axioms PiQuasi.every_finite_fp_wrapped_balloon_leaks
+#print axioms PiQuasi.leakage_survives_any_finite_precision_increase
+#print axioms PiQuasi.finite_precision_never_repairs_leakage
+
+#print axioms PiQuasi.fp_bottleneck_persists
+#print axioms PiQuasi.fp_bottleneck_persists_after_any_finite_growth

@@ -1,0 +1,12 @@
+import PiQuasi.FiniteRepresentationExactnessBarrier
+
+#print axioms PiQuasi.finite_representation_not_exact
+#print axioms PiQuasi.finite_representation_not_actual_completion
+#print axioms PiQuasi.arbitrary_finite_reencoding_not_exact
+#print axioms PiQuasi.arbitrary_finite_reencoding_not_completion
+#print axioms PiQuasi.finite_code_growth_never_creates_exactness
+#print axioms PiQuasi.no_finite_encoding_scheme_creates_exactness
+#print axioms PiQuasi.no_finite_encoding_scheme_creates_completion
+#print axioms PiQuasi.every_finitely_encoded_pi_balloon_leaks
+#print axioms PiQuasi.arbitrary_finite_balloon_reencoding_still_leaks
+#print axioms PiQuasi.finite_representation_barrier

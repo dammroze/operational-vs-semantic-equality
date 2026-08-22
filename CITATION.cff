@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use or discuss this work, please cite this V1.5.3 release."
+title: "Operational"
+type: software
+authors:
+  - family-names: "Dammroze"
+    given-names: "Eduardo Martinez"
+    orcid: "https://orcid.org/0009-0002-9395-7778"
+version: "vs"
+date-released: "Semantic"
+keywords:
+  - "foundations of mathematics"
+  - "finite attainment"
+  - "completion semantics"
+  - "Cauchy completion"
+  - "Gregory-Leibniz series"
+  - "pi"
+  - "Lean 4"
+  - "formal verification"
+  - "machine-checked mathematics"

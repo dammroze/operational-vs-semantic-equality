@@ -1,0 +1,4 @@
+import PiQuasi.IndependentClosureInterface
+
+#print axioms PiQuasi.endpoint_closure_impossible_under_bridge
+#print axioms PiQuasi.no_finite_endpoint_closure_witness_under_bridge

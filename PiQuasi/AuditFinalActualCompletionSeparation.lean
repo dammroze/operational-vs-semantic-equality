@@ -1,0 +1,18 @@
+import PiQuasi.FinalActualCompletionSeparation
+
+#print axioms PiQuasi.actual_completion_is_closed
+#print axioms PiQuasi.no_finite_completion_closure_attainment
+#print axioms PiQuasi.actual_completion_has_no_finite_origin
+#print axioms PiQuasi.every_closed_extension_is_the_added_completion
+
+#print axioms PiQuasi.final_every_finite_stage_nonterminal
+#print axioms PiQuasi.final_every_finite_progress_stage_nonclosed
+#print axioms PiQuasi.final_no_finite_progress_closure_witness
+#print axioms PiQuasi.final_no_eventual_finite_closure
+#print axioms PiQuasi.final_no_last_finite_closure_witness
+
+#print axioms PiQuasi.completion_does_not_retroactively_create_finite_attainment
+#print axioms PiQuasi.completion_does_not_retroactively_create_finite_progress_closure
+
+#print axioms PiQuasi.completed_closure_without_finite_attainment
+#print axioms PiQuasi.final_actual_completion_separation
